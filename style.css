@@ -11,62 +11,144 @@
     --shadow: 0 8px 24px rgba(0,0,0,.08);
     --radius: 12px;
   
-    --sidebar-w: 240px;
-    --container: 1100px;
+    --topbar-h: 60px;
+    --side-w: 240px;
   }
   
-  /* ============ Base / Reset ============ */
+  /* Base */
   *{ box-sizing: border-box; }
-  html, body{ height: 100%; }
-  
+  html,body{ height: 100%; }
   body{
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: var(--bg);
+    background: var(--bg);
     color: var(--text);
     line-height: 1.5;
+  
+    /* Üst menü sabit + sol menü sabit olacağı için içerik boşlukları */
+    padding-top: var(--topbar-h);
+    padding-left: var(--side-w);
   }
   
   h1{
     text-align: center;
-    margin: 24px 12px;
+    margin: 20px 12px;
     font-size: 28px;
-    letter-spacing: .2px;
   }
   
-  /* ============ Left Vertical Menu (Sidebar) ============ */
-  /*
-    HTML'de menünüz nav içinde linklerden oluşuyorsa (ör. <nav>...<a>...</a></nav>)
-    bu CSS menüyü SOL + DİKEY yapar.
-  */
-  nav{
+  /* Linkler */
+  a{
+    color: var(--primary);
+    text-decoration: none;
+  }
+  a:hover{
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+  
+  /* =========================================================
+     ÜST YATAY MENÜ: Anasayfa / Duyurular / Notlar / İletişim
+     (header içindeki nav hedeflenir)
+     ========================================================= */
+  header{
     position: fixed;
     top: 0;
     left: 0;
-    width: var(--sidebar-w);
-    height: 100vh;
-    padding: 16px 12px;
+    right: 0;
+    height: var(--topbar-h);
     background: #111827;
-    box-shadow: 2px 0 14px rgba(0,0,0,.12);
+    color: #fff;
+    z-index: 50;
+    box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Header içinde bir başlık/brand varsa (CENG Web Demo gibi) */
+  header .brand,
+  header h1,
+  header h2{
+    margin: 0 14px 0 16px;
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: #fff;
+  }
+  
+  /* Üst nav yatay */
+  header nav{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: 8px;
+  }
+  
+  /* Üst nav link */
+  header nav a{
+    display: inline-block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #e5e7eb;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  header nav a:hover{
+    background: rgba(255,255,255,.10);
+    color: #fff;
+    text-decoration: none;
+  }
+  header nav a.active{
+    background: rgba(37,99,235,.25);
+    color: #fff;
+  }
+  
+  /* Header sağ tarafta "Can," yazısı varsa */
+  header .user,
+  header .who,
+  header .name{
+    margin-left: auto;
+    margin-right: 16px;
+    color: #e5e7eb;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  
+  /* =========================================================
+     SOL DİKEY MENÜ: "Menü" (Dashboard / Ödevler / Kaynaklar...)
+     (aside içindeki linkler hedeflenir)
+     ========================================================= */
+  aside{
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    width: var(--side-w);
+    height: calc(100vh - var(--topbar-h));
+    background: #0f172a;
+    padding: 14px 12px;
+    z-index: 40;
+    box-shadow: 2px 0 14px rgba(0,0,0,.10);
+    overflow-y: auto;
+  }
+  
+  /* Aside içinde başlık: "Menü" */
+  aside h2, aside h3{
+    margin: 6px 10px 10px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  
+  /* Aside içinde nav varsa dikey */
+  aside nav{
     display: flex;
     flex-direction: column;
     gap: 6px;
-    z-index: 10;
   }
   
-  /* Menüde üstte "CENG Web Demo" gibi bir başlık kullanırsanız:
-     <div class="brand">CENG Web Demo</div> */
-  nav .brand{
-    color: #ffffff;
-    font-weight: 900;
-    letter-spacing: .3px;
-    padding: 10px 10px 14px;
-    border-bottom: 1px solid rgba(255,255,255,.12);
-    margin-bottom: 6px;
-  }
-  
-  /* Menü linkleri */
-  nav a{
+  /* Eğer aside içinde direkt <a>’ler varsa */
+  aside a{
     display: block;
     padding: 10px 12px;
     border-radius: 10px;
@@ -74,86 +156,50 @@
     font-weight: 700;
     text-decoration: none;
   }
-  
-  nav a:hover{
+  aside a:hover{
     background: rgba(255,255,255,.10);
-    color: #ffffff;
+    color: #fff;
     text-decoration: none;
   }
-  
-  nav a.active{
+  aside a.active{
     background: rgba(37,99,235,.25);
-    color: #ffffff;
+    color: #fff;
   }
   
-  /* Sayfa içeriği menünün altına girmesin diye soldan boşluk */
-  main, .container, .card, .sidebar, table, h1{
-    margin-left: calc(var(--sidebar-w) + 16px);
+  /* =========================================================
+     İçerik kutuları
+     ========================================================= */
+  main{
+    padding: 18px;
   }
   
-  /* ============ "Can," üst bilgi gibi küçük bir alan varsa ============ */
-  .top-user{
-    color: #e5e7eb;
-    margin-top: auto;         /* en alta iter */
-    padding: 10px 12px;
-    border-top: 1px solid rgba(255,255,255,.12);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  
-  /* ============ Links (genel) ============ */
-  a{
-    text-decoration: none;
-    color: var(--primary);
-  }
-  a:hover{
-    text-decoration: underline;
-    color: var(--primary-dark);
-  }
-  
-  /* Menü linkleri, genel a stillerini ezsin diye tekrar */
-  nav a{ color: #e5e7eb; }
-  nav a:hover{ color: #ffffff; text-decoration: none; }
-  
-  /* ============ Cards / Sidebar Box (sayfa içi paneller) ============ */
   .card{
-    background-color: var(--surface);
+    background: var(--surface);
     padding: 16px;
-    margin: 20px;
+    margin: 18px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     border: 1px solid rgba(0,0,0,.04);
   }
   
   .sidebar{
-    background-color: var(--surface);
+    background: var(--surface);
     padding: 14px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     box-shadow: 0 6px 18px rgba(0,0,0,.06);
   }
   
-  .sidebar a{
-    display: block;
-    padding: 10px 10px;
-    border-radius: 10px;
-    color: var(--text);
-  }
-  .sidebar a:hover{
-    background: #eef2f6;
-    text-decoration: none;
-  }
-  
-  /* ============ Tables ============ */
+  /* =========================================================
+     Tablo
+     ========================================================= */
   .table-wrap{
-    width: calc(100% - (var(--sidebar-w) + 16px));
+    width: 100%;
     overflow-x: auto;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--surface);
     box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    margin-left: calc(var(--sidebar-w) + 16px);
-    margin-right: 16px;
   }
   
   table{
@@ -179,47 +225,30 @@
   tbody tr:nth-child(even){
     background: #f9fafb;
   }
-  
   tbody tr:hover{
     background: #eef2ff;
   }
   
-  /* ============ Responsive (mobilde menü üstte yataya döner) ============ */
-  @media (max-width: 760px){
-    :root{ --sidebar-w: 100%; }
-  
-    nav{
-      position: sticky;
-      width: 100%;
+  /* =========================================================
+     Responsive: mobilde sol menü alta/üstte daha sade
+     ========================================================= */
+  @media (max-width: 820px){
+    :root{
+      --side-w: 0px;
+    }
+    body{
+      padding-left: 0;
+    }
+    aside{
+      position: static;
+      width: auto;
       height: auto;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
+      top: auto;
+      box-shadow: none;
+      border-bottom: 1px solid rgba(255,255,255,.12);
     }
-  
-    nav .brand{
-      border-bottom: 0;
-      margin-bottom: 0;
-      padding: 8px 10px;
-    }
-  
-    .top-user{
-      margin-top: 0;
-      border-top: 0;
-      margin-left: auto;
-      padding: 8px 10px;
-    }
-  
-    main, .container, .card, .sidebar, table, h1{
-      margin-left: 0;
-    }
-  
-    .table-wrap{
-      width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-      border-left: 0;
-      border-right: 0;
-      border-radius: 0;
+    main{
+      padding: 14px;
     }
   }
+  
