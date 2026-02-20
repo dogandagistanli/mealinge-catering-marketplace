@@ -1,147 +1,225 @@
-/* =========================
-   GENEL AYARLAR
-   ========================= */
-
-   body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f2f2f2;
+:root{
+    --bg: #f2f2f2;
+    --surface: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+  
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+  
+    --border: #d1d5db;
+    --shadow: 0 8px 24px rgba(0,0,0,.08);
+    --radius: 12px;
+  
+    --sidebar-w: 240px;
+    --container: 1100px;
+  }
+  
+  /* ============ Base / Reset ============ */
+  *{ box-sizing: border-box; }
+  html, body{ height: 100%; }
+  
+  body{
     margin: 0;
-    color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
   }
   
-  /* =========================
-     ÜST NAVBAR (YATAY ŞERİT)
-     ========================= */
-  
-  .topbar {
-    width: 100%;
-    background-color: #1f2937;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  
-  .topbar .logo {
-    font-weight: bold;
-    font-size: 18px;
-  }
-  
-  .topbar nav {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .topbar nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-  }
-  
-  .topbar nav a:hover {
-    background-color: rgba(255,255,255,0.15);
-    text-decoration: none;
-  }
-  
-  /* =========================
-     BAŞLIK
-     ========================= */
-  
-  h1 {
+  h1{
     text-align: center;
-    margin-top: 20px;
+    margin: 24px 12px;
+    font-size: 28px;
+    letter-spacing: .2px;
   }
   
-  /* =========================
-     CARD TASARIMI
-     ========================= */
+  /* ============ Left Vertical Menu (Sidebar) ============ */
+  /*
+    HTML'de menünüz nav içinde linklerden oluşuyorsa (ör. <nav>...<a>...</a></nav>)
+    bu CSS menüyü SOL + DİKEY yapar.
+  */
+  nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    padding: 16px 12px;
+    background: #111827;
+    box-shadow: 2px 0 14px rgba(0,0,0,.12);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 10;
+  }
   
-  .card {
-    background-color: white;
-    padding: 15px;
-    margin: 20px;
+  /* Menüde üstte "CENG Web Demo" gibi bir başlık kullanırsanız:
+     <div class="brand">CENG Web Demo</div> */
+  nav .brand{
+    color: #ffffff;
+    font-weight: 900;
+    letter-spacing: .3px;
+    padding: 10px 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    margin-bottom: 6px;
+  }
+  
+  /* Menü linkleri */
+  nav a{
+    display: block;
+    padding: 10px 12px;
     border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  }
-  
-  /* =========================
-     SIDEBAR
-     ========================= */
-  
-  .sidebar {
-    background-color: #e5e5e5;
-    padding: 15px;
-    border-radius: 10px;
-  }
-  
-  /* =========================
-     LINKLER
-     ========================= */
-  
-  a {
+    color: #e5e7eb;
+    font-weight: 700;
     text-decoration: none;
-    color: #2563eb;
-    transition: color 0.2s;
   }
   
-  a:hover {
+  nav a:hover{
+    background: rgba(255,255,255,.10);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  
+  nav a.active{
+    background: rgba(37,99,235,.25);
+    color: #ffffff;
+  }
+  
+  /* Sayfa içeriği menünün altına girmesin diye soldan boşluk */
+  main, .container, .card, .sidebar, table, h1{
+    margin-left: calc(var(--sidebar-w) + 16px);
+  }
+  
+  /* ============ "Can," üst bilgi gibi küçük bir alan varsa ============ */
+  .top-user{
+    color: #e5e7eb;
+    margin-top: auto;         /* en alta iter */
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  
+  /* ============ Links (genel) ============ */
+  a{
+    text-decoration: none;
+    color: var(--primary);
+  }
+  a:hover{
     text-decoration: underline;
-    color: #1d4ed8;
+    color: var(--primary-dark);
   }
   
-  /* =========================
-     TABLO TASARIMI
-     ========================= */
+  /* Menü linkleri, genel a stillerini ezsin diye tekrar */
+  nav a{ color: #e5e7eb; }
+  nav a:hover{ color: #ffffff; text-decoration: none; }
   
-  table {
+  /* ============ Cards / Sidebar Box (sayfa içi paneller) ============ */
+  .card{
+    background-color: var(--surface);
+    padding: 16px;
+    margin: 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,.04);
+  }
+  
+  .sidebar{
+    background-color: var(--surface);
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  }
+  
+  .sidebar a{
+    display: block;
+    padding: 10px 10px;
+    border-radius: 10px;
+    color: var(--text);
+  }
+  .sidebar a:hover{
+    background: #eef2f6;
+    text-decoration: none;
+  }
+  
+  /* ============ Tables ============ */
+  .table-wrap{
+    width: calc(100% - (var(--sidebar-w) + 16px));
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    margin-left: calc(var(--sidebar-w) + 16px);
+    margin-right: 16px;
+  }
+  
+  table{
     border-collapse: collapse;
     width: 100%;
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
+    min-width: 640px;
+    background: var(--surface);
   }
   
-  th {
-    background-color: #f4f4f4;
+  th, td{
+    border: 1px solid var(--border);
+    padding: 10px 12px;
     text-align: left;
-    padding: 10px;
-    border-bottom: 2px solid #ddd;
+    vertical-align: middle;
   }
   
-  td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+  th{
+    background: #111827;
+    color: #ffffff;
+    font-weight: 800;
   }
   
-  /* Zebra satırlar */
-  tr:nth-child(even) {
-    background-color: #fafafa;
+  tbody tr:nth-child(even){
+    background: #f9fafb;
   }
   
-  /* Hover efekti */
-  tr:hover {
-    background-color: #f1f5ff;
+  tbody tr:hover{
+    background: #eef2ff;
   }
   
-  /* =========================
-     RESPONSIVE (basit)
-     ========================= */
+  /* ============ Responsive (mobilde menü üstte yataya döner) ============ */
+  @media (max-width: 760px){
+    :root{ --sidebar-w: 100%; }
   
-  @media (max-width: 600px) {
-  
-    .topbar {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .topbar nav {
+    nav{
+      position: sticky;
+      width: 100%;
+      height: auto;
+      flex-direction: row;
       flex-wrap: wrap;
-      justify-content: center;
+      align-items: center;
     }
   
+    nav .brand{
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding: 8px 10px;
+    }
+  
+    .top-user{
+      margin-top: 0;
+      border-top: 0;
+      margin-left: auto;
+      padding: 8px 10px;
+    }
+  
+    main, .container, .card, .sidebar, table, h1{
+      margin-left: 0;
+    }
+  
+    .table-wrap{
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      border-left: 0;
+      border-right: 0;
+      border-radius: 0;
+    }
   }
