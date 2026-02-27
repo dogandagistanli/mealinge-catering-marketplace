@@ -248,14 +248,14 @@ tbody tr:hover{
 }
 
 /* =========================================================
-   Tablo altındaki görsel (centered)
+   Görsel kartı içindeki görsel (centered)
    ========================================================= */
 .table-image{
   display: block;
   width: auto;
-  max-width: 320px;   /* büyük olmasını engeller */
+  max-width: 320px;
   height: auto;
-  margin: 12px auto 0 auto; /* centered */
+  margin: 12px auto 0 auto;
   border-radius: 10px;
   border: 1px solid var(--border);
 }

@@ -45,6 +45,7 @@
 
     <!-- MAIN CONTENT -->
     <main class="content">
+      <!-- 1st card -->
       <section class="card" id="weekCard">
         <h1 class="card__title" id="weekTitle">1. Hafta: HTML & CSS Sayfa İskeleti</h1>
         <p class="card__text" id="weekContent">
@@ -63,6 +64,7 @@
         <button type="button" id="changeWeekBtn">İçeriği Değiştir</button>
       </section>
 
+      <!-- 2nd card: student table -->
       <section class="card">
         <h2 class="card__subtitle">Örnek Veri Tablosu (3 x 5)</h2>
 
@@ -94,14 +96,23 @@
 
         <button type="button" id="sortGradesBtn">Notlara Göre Sırala</button>
 
-        <!-- Image section -->
-        <img src="images.png" alt="Örnek veri tablosu görseli" class="table-image" id="tableImage" />
-
-        <button type="button" id="changeImageBtn">Görseli Değiştir</button>
-
         <p class="muted">
           Not: Bu tablo 3 satır (öğrenci) ve 5 sütun içerir.
         </p>
+      </section>
+
+      <!-- 3rd card: image card (independent) -->
+      <section class="card">
+        <h2 class="card__subtitle">Örnek Görsel Alanı</h2>
+
+        <img
+          src="images.png"
+          alt="Örnek veri tablosu görseli"
+          class="table-image"
+          id="tableImage"
+        />
+
+        <button type="button" id="changeImageBtn">Görseli Değiştir</button>
       </section>
 
       <footer class="footer">
