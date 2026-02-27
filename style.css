@@ -147,7 +147,7 @@ aside a{
   display: block;
   padding: 10px 12px;
   border-radius: 10px;
-  color: #e5e7eb; /* koyu arkaplanda görünür */
+  color: #000; /* koyu arkaplanda görünür */
   font-weight: 700;
   text-decoration: none;
 }
