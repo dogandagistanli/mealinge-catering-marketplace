@@ -252,4 +252,12 @@
     }
   }
 
-  
+  .table-image{
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
