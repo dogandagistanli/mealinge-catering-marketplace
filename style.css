@@ -188,7 +188,8 @@ main{
 
 /* Button styles (centered) */
 #changeWeekBtn,
-#sortGradesBtn{
+#sortGradesBtn,
+#changeImageBtn{
   display: block;
   margin: 12px auto 0 auto;
   padding: 10px 14px;
@@ -200,7 +201,8 @@ main{
   font-weight: 700;
 }
 #changeWeekBtn:hover,
-#sortGradesBtn:hover{
+#sortGradesBtn:hover,
+#changeImageBtn:hover{
   background: var(--primary-dark);
   border-color: var(--primary-dark);
 }
@@ -246,14 +248,14 @@ tbody tr:hover{
 }
 
 /* =========================================================
-   Tablo altındaki görsel (küçük/orijinal boyuta yakın)
+   Tablo altındaki görsel (centered)
    ========================================================= */
 .table-image{
   display: block;
   width: auto;
   max-width: 320px;   /* büyük olmasını engeller */
   height: auto;
-  margin: 12px 0;
+  margin: 12px auto 0 auto; /* centered */
   border-radius: 10px;
   border: 1px solid var(--border);
 }
