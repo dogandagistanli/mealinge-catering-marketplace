@@ -3,48 +3,68 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ceng382_25_26_202311031</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Mealora</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Ceng382_25_26_202311031.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ceng382_25_26_202311031</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-box">
+                <div class="brand-logo">M</div>
+                <div>
+                    <h2 class="brand-title">Temporary Brand</h2>
+                    <p class="brand-subtitle">Catering & Care Platform</p>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">Home</a>
+                <a href="#" class="nav-item">Nearby Kitchens</a>
+                <a href="#" class="nav-item">Menus</a>
+                <a href="#" class="nav-item">Cart</a>
+                <a href="#" class="nav-item">Orders</a>
+                <a href="#" class="nav-item">Dashboard</a>
+                <a href="#" class="nav-item">Contact</a>
+            </nav>
+
+            <div class="sidebar-card">
+                <h4>Fresh Project Start</h4>
+                <p>
+                    Week 1 focuses on the main visual structure, starter CSS, and the core UI shell.
+                </p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div>
+                    <h1 class="topbar-title">Temporary Brand    </h1>
+                    <p class="topbar-text">Order smarter. Connect faster. Manage catering easily.</p>
+                </div>
+
+                <div class="topbar-actions">
+                    <a href="#" class="top-btn ghost-btn">Sign In</a>
+                    <a href="#" class="top-btn solid-btn">Get Started</a>
+                </div>
+            </header>
+
+            <main class="content-area">
+                @RenderBody()
+            </main>
+
+            <footer class="footer">
+                <div>
+                    <strong>Temporary Brand</strong> © 2026 - CENG 382 Web Project
+                </div>
+                <div>
+                    Designed for a unique catering platform experience.
+                </div>
+            </footer>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Ceng382_25_26_202311031 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
