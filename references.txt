@@ -1,14 +1,3 @@
-https://chatgpt.com/share/69980d1a-6700-8011-ba46-30886bbfe88a (week1)
-https://chatgpt.com/share/69a14668-5cf4-8011-9f35-42ced24a2470 (week2)
-
-----------------WEEK3 HOMEWORK REFERENCES----------------
-https://gemini.google.com/share/c100c476e4cd
-https://gemini.google.com/share/ae5eee60106f
-https://chatgpt.com/share/69a96815-0abc-8011-9fdf-c9696e0523b9
-https://www.w3schools.com/js/js_htmldom_animate.asp
-https://tr.javascript.info/js-animation
-https://chatgpt.com/share/69a96994-becc-8011-bd41-f5de714db2c6
-https://chatgpt.com/share/69a96b9f-c678-8011-b13e-e350e485cf7b
-https://gemini.google.com/share/e2c7ab740422
----------------------------------------------------------
+WEEK1 Project:
+https://chatgpt.com/share/69d8a924-4eec-838a-8e83-ea586abbaf1b
 
