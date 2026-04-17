@@ -1,0 +1,19 @@
+@model List<Ceng382_25_26_202311031.Models.MenuItem>
+
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<h1>Menu</h1>
+
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+    @foreach (var item in Model)
+    {
+        <div style="border:1px solid #ccc; padding:15px; width:250px; border-radius:10px;">
+            <h3>@item.Name</h3>
+            <p><strong>Caterer:</strong> @item.CatererName</p>
+            <p>@item.Description</p>
+            <p><strong>Price:</strong> @item.Price ₺</p>
+        </div>
+    }
+</div>
