@@ -17,19 +17,19 @@ namespace Ceng382_25_26_202311031.Controllers
             return RedirectToAction("UserDashboard");
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public IActionResult Admin()
         {
             return View();
         }
 
-        [Authorize(Roles = "Caterer")]
+        [Authorize]
         public IActionResult Caterer()
         {
             return View();
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize]
         public IActionResult UserDashboard()
         {
             return View();
