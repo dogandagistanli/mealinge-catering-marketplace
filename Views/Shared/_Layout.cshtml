@@ -14,7 +14,7 @@
                 <div class="brand-logo">M</div>
                 <div>
                     <h2 class="brand-title">Mealinge</h2>
-                    <p class="brand-subtitle">Catering & Care Platform</p>
+                    <p class="brand-subtitle">Smart Catering Platform</p>
                 </div>
             </div>
 
@@ -29,9 +29,9 @@
             </nav>
 
             <div class="sidebar-card">
-                <h4>Fresh Project Start</h4>
+                <h4>Platform Overview</h4>
                 <p>
-                    Week 1 focuses on the main visual structure, starter CSS, and the core UI shell.
+                    Explore menus, manage dashboard access, and organize catering services in one place.
                 </p>
             </div>
         </aside>
@@ -43,25 +43,25 @@
                     <p class="topbar-text">Order smarter. Connect faster. Manage catering easily.</p>
                 </div>
 
-           <div class="topbar-actions">
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
-    {
-        <a asp-controller="Dashboard" asp-action="Index" class="top-btn ghost-btn">Dashboard</a>
+                <div class="topbar-actions">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Dashboard" asp-action="Index" class="top-btn ghost-btn">Dashboard</a>
 
-        <form asp-area="Identity"
-              asp-page="/Account/Logout"
-              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
-              method="post"
-              style="display:inline;">
-            <button type="submit" class="top-btn solid-btn" style="border:none;">Logout</button>
-        </form>
-    }
-    else
-    {
-        <a href="/Identity/Account/Login" class="top-btn ghost-btn">Sign In</a>
-        <a href="/Identity/Account/Register" class="top-btn solid-btn">Get Started</a>
-    }
-</div>
+                        <form asp-area="Identity"
+                              asp-page="/Account/Logout"
+                              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                              method="post"
+                              style="display:inline;">
+                            <button type="submit" class="top-btn solid-btn" style="border:none;">Logout</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a href="/Identity/Account/Login" class="top-btn ghost-btn">Sign In</a>
+                        <a href="/Identity/Account/Register" class="top-btn solid-btn">Get Started</a>
+                    }
+                </div>
             </header>
 
             <main class="content-area">
