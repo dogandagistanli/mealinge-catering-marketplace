@@ -20,12 +20,12 @@ namespace Ceng382_25_26_202311031.Data
                 }
             }
 
-            if (await userManager.FindByEmailAsync("admin@mealora.com") == null)
+            if (await userManager.FindByEmailAsync("admin@mealinge.com") == null)
             {
                 var admin = new ApplicationUser
                 {
-                    UserName = "admin@mealora.com",
-                    Email = "admin@mealora.com",
+                    UserName = "admin@mealinge.com",
+                    Email = "admin@mealinge.com",
                     FullName = "System Admin",
                     RoleDisplayName = "Admin",
                     EmailConfirmed = true
@@ -38,12 +38,12 @@ namespace Ceng382_25_26_202311031.Data
                 }
             }
 
-            if (await userManager.FindByEmailAsync("caterer1@mealora.com") == null)
+            if (await userManager.FindByEmailAsync("caterer1@mealinge.com") == null)
             {
                 var caterer1 = new ApplicationUser
                 {
-                    UserName = "caterer1@mealora.com",
-                    Email = "caterer1@mealora.com",
+                    UserName = "caterer1@mealinge.com",
+                    Email = "caterer1@mealinge.com",
                     FullName = "Taste Kitchen",
                     RoleDisplayName = "Caterer",
                     EmailConfirmed = true
@@ -56,12 +56,12 @@ namespace Ceng382_25_26_202311031.Data
                 }
             }
 
-            if (await userManager.FindByEmailAsync("user1@mealora.com") == null)
+            if (await userManager.FindByEmailAsync("user1@mealinge.com") == null)
             {
                 var user1 = new ApplicationUser
                 {
-                    UserName = "user1@mealora.com",
-                    Email = "user1@mealora.com",
+                    UserName = "user1@mealinge.com",
+                    Email = "user1@mealinge.com",
                     FullName = "Demo User One",
                     RoleDisplayName = "User",
                     EmailConfirmed = true
