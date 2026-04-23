@@ -8,5 +8,8 @@ namespace Ceng382_25_26_202311031.Models
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = "";
         public string CatererName { get; set; } = "";
+
+        public string? CatererId { get; set; }
+        public ApplicationUser? Caterer { get; set; }
     }
 }

@@ -43,10 +43,25 @@
                     <p class="topbar-text">Order smarter. Connect faster. Manage catering easily.</p>
                 </div>
 
-                <div class="topbar-actions">
-                    <a href="#" class="top-btn ghost-btn">Sign In</a>
-                    <a href="#" class="top-btn solid-btn">Get Started</a>
-                </div>
+           <div class="topbar-actions">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <a asp-controller="Dashboard" asp-action="Index" class="top-btn ghost-btn">Dashboard</a>
+
+        <form asp-area="Identity"
+              asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+              method="post"
+              style="display:inline;">
+            <button type="submit" class="top-btn solid-btn" style="border:none;">Logout</button>
+        </form>
+    }
+    else
+    {
+        <a href="/Identity/Account/Login" class="top-btn ghost-btn">Sign In</a>
+        <a href="/Identity/Account/Register" class="top-btn solid-btn">Get Started</a>
+    }
+</div>
             </header>
 
             <main class="content-area">
