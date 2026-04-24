@@ -13,6 +13,8 @@
     @foreach (var item in Model)
     {
         <div class="menu-card">
+            <img class="menu-image" src="@(string.IsNullOrWhiteSpace(item.ImageUrl) ? "/images/food-hero-1.jpg" : item.ImageUrl)" alt="@item.Name" />
+
             <div class="menu-card-body">
                 <div class="menu-top">
                     <h3>@item.Name</h3>
