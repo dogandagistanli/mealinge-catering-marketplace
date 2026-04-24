@@ -1,0 +1,44 @@
+@model Ceng382_25_26_202311031.Models.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Payment</h1>
+    <p class="page-subtitle">This is a payment simulation screen.</p>
+</section>
+
+<div class="payment-form-box">
+    <form asp-action="Checkout" method="post" class="payment-form">
+        <div class="form-group">
+            <label asp-for="CardHolderName"></label>
+            <input asp-for="CardHolderName" class="form-control" />
+            <span asp-validation-for="CardHolderName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CardNumber"></label>
+            <input asp-for="CardNumber" class="form-control" />
+            <span asp-validation-for="CardNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ExpiryDate"></label>
+            <input asp-for="ExpiryDate" class="form-control" />
+            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CVV"></label>
+            <input asp-for="CVV" class="form-control" />
+            <span asp-validation-for="CVV" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="menu-btn">Confirm Payment</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,19 +1,32 @@
 @model List<Ceng382_25_26_202311031.Models.MenuItem>
 
 @{
-    ViewData["Title"] = "Menu";
+    ViewData["Title"] = "Menus";
 }
 
-<h1>Menu</h1>
+<section class="page-header">
+    <h1 class="page-title">Menus</h1>
+    <p class="page-subtitle">Browse available meals and add them to your cart.</p>
+</section>
 
-<div style="display:flex; gap:20px; flex-wrap:wrap;">
+<div class="menu-grid">
     @foreach (var item in Model)
     {
-        <div style="border:1px solid #ccc; padding:15px; width:250px; border-radius:10px;">
-            <h3>@item.Name</h3>
-            <p><strong>Caterer:</strong> @item.CatererName</p>
-            <p>@item.Description</p>
-            <p><strong>Price:</strong> @item.Price ₺</p>
+        <div class="menu-card">
+            <div class="menu-card-body">
+                <div class="menu-top">
+                    <h3>@item.Name</h3>
+                    <span class="price-badge">@item.Price ₺</span>
+                </div>
+
+                <p class="menu-caterer"><strong>Caterer:</strong> @item.CatererName</p>
+                <p class="menu-description">@item.Description</p>
+
+                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                    <input type="hidden" name="menuItemId" value="@item.Id" />
+                    <button type="submit" class="menu-btn">Add to Cart</button>
+                </form>
+            </div>
         </div>
     }
 </div>
