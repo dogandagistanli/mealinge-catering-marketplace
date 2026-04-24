@@ -93,11 +93,9 @@
                 const btn = document.getElementById("themeToggle");
                 if (!btn) return;
 
-                if (document.body.classList.contains("dark-theme")) {
-                    btn.textContent = "Light Mode";
-                } else {
-                    btn.textContent = "Dark Mode";
-                }
+                btn.textContent = document.body.classList.contains("dark-theme")
+                    ? "Light Mode"
+                    : "Dark Mode";
             }
 
             document.addEventListener("DOMContentLoaded", function () {
