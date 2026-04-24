@@ -1,0 +1,55 @@
+@model List<Ceng382_25_26_202311031.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<section class="page-header">
+    <h1 class="page-title">My Orders</h1>
+    <p class="page-subtitle">Review your completed purchases.</p>
+</section>
+
+@if (!Model.Any())
+{
+    <div class="empty-box">
+        <p>You do not have any orders yet.</p>
+    </div>
+}
+else
+{
+    <div class="cart-table-wrapper">
+        @foreach (var order in Model)
+        {
+            <div class="feature-card" style="margin-bottom:20px;">
+                <h3>Order #@order.Id</h3>
+                <p><strong>Date:</strong> @order.OrderDate</p>
+                <p><strong>Status:</strong> @order.Status</p>
+                <p><strong>Total:</strong> @order.TotalAmount ₺</p>
+
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Caterer</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.MenuItemName</td>
+                                <td>@item.CatererName</td>
+                                <td>@item.UnitPrice ₺</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Subtotal ₺</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+}

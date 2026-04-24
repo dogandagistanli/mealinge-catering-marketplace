@@ -12,5 +12,7 @@ namespace Ceng382_25_26_202311031.Data
         }
 
         public DbSet<MenuItem> MenuItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
     }
 }
