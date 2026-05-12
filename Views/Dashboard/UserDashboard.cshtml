@@ -1,2 +1,55 @@
-<h2>User Dashboard</h2>
-<p>Users can browse menus and see their activity here.</p>
+@{
+    ViewData["Title"] = "User Dashboard";
+}
+
+<section class="page-header">
+    <h1 class="page-title">User Dashboard</h1>
+    <p class="page-subtitle">Track your orders, spending, and platform activity.</p>
+</section>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>Total Orders</h3>
+        <p style="font-size:32px;font-weight:800;">
+            @ViewBag.TotalOrders
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Spent</h3>
+        <p style="font-size:32px;font-weight:800;">
+            @ViewBag.TotalSpent.ToString("0.00") ₺
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Ratings</h3>
+        <p style="font-size:32px;font-weight:800;">
+            @ViewBag.TotalRatings
+        </p>
+    </div>
+</div>
+
+<div class="feature-card" style="margin-top:25px;">
+    <h3>User Shortcuts</h3>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;">
+        <a asp-controller="Menu"
+           asp-action="Index"
+           class="menu-btn">
+            Browse Menus
+        </a>
+
+        <a asp-controller="Orders"
+           asp-action="Index"
+           class="hero-btn secondary-btn">
+            View Orders
+        </a>
+
+        <a asp-controller="Cart"
+           asp-action="Index"
+           class="hero-btn secondary-btn">
+            Open Cart
+        </a>
+    </div>
+</div>

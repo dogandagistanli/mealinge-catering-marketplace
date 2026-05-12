@@ -1,2 +1,70 @@
-<h2>Caterer Dashboard</h2>
-<p>Caterers can manage their own menu items here.</p>
+@{
+    ViewData["Title"] = "Caterer Dashboard";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Caterer Dashboard</h1>
+    <p class="page-subtitle">Track menu activity, orders, revenue, and customer feedback.</p>
+</section>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>Total Menus</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalMenus</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Orders</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalOrders</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Revenue</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalRevenue.ToString("0.00") ₺</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Average Rating</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.AverageRating.ToString("0.0") / 5</p>
+    </div>
+</div>
+
+<div class="feature-card" style="margin-top:25px;">
+    <h3>Recent Customer Ratings</h3>
+
+    @if (ViewBag.RecentRatings == null || ViewBag.RecentRatings.Count == 0)
+    {
+        <p>No ratings received yet.</p>
+    }
+    else
+    {
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Menu</th>
+                    <th>Menu Score</th>
+                    <th>Caterer Score</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var rating in ViewBag.RecentRatings)
+                {
+                    <tr>
+                        <td>@rating.MenuItemName</td>
+                        <td>@rating.MenuItemScore / 5</td>
+                        <td>@rating.CatererScore / 5</td>
+                        <td>@rating.Comment</td>
+                        <td>@rating.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div style="margin-top:25px;">
+    <a asp-controller="Menu" asp-action="Manage" class="menu-btn">Manage Menus</a>
+</div>

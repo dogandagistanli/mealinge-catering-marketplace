@@ -1,12 +1,20 @@
 using System.Text.Json;
+using Ceng382_25_26_202311031.Data;
 using Ceng382_25_26_202311031.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ceng382_25_26_202311031.Controllers
 {
     public class CartController : Controller
     {
         private const string CartSessionKey = "Cart";
+        private readonly ApplicationDbContext _context;
+
+        public CartController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public IActionResult Index()
         {
@@ -15,17 +23,33 @@ namespace Ceng382_25_26_202311031.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddToCart(int menuItemId)
+        public async Task<IActionResult> AddToCart(int menuItemId, List<int>? selectedOptions)
         {
-            var menuItems = GetSampleMenuItems();
-            var menuItem = menuItems.FirstOrDefault(x => x.Id == menuItemId);
+            var menuItem = await _context.MenuItems
+                .Include(x => x.CustomizationOptions)
+                .FirstOrDefaultAsync(x => x.Id == menuItemId);
 
             if (menuItem == null)
                 return NotFound();
 
+            selectedOptions ??= new List<int>();
+
+            var chosenOptions = menuItem.CustomizationOptions?
+                .Where(x => selectedOptions.Contains(x.Id))
+                .ToList() ?? new List<CustomizationOption>();
+
+            var selectedText = chosenOptions.Any()
+                ? string.Join(", ", chosenOptions.Select(x => $"{x.OptionName} ({x.PriceChange} ₺)"))
+                : "No customization";
+
+            var customizationPrice = chosenOptions.Sum(x => x.PriceChange);
+
             var cart = GetCart();
 
-            var existingItem = cart.FirstOrDefault(x => x.MenuItemId == menuItemId);
+            var existingItem = cart.FirstOrDefault(x =>
+                x.MenuItemId == menuItemId &&
+                x.SelectedCustomizations == selectedText);
+
             if (existingItem != null)
             {
                 existingItem.Quantity++;
@@ -38,6 +62,8 @@ namespace Ceng382_25_26_202311031.Controllers
                     Name = menuItem.Name,
                     CatererName = menuItem.CatererName,
                     UnitPrice = menuItem.Price,
+                    CustomizationPrice = customizationPrice,
+                    SelectedCustomizations = selectedText,
                     Quantity = 1,
                     Description = menuItem.Description
                 });
@@ -48,10 +74,12 @@ namespace Ceng382_25_26_202311031.Controllers
         }
 
         [HttpPost]
-        public IActionResult Remove(int menuItemId)
+        public IActionResult Remove(int menuItemId, string selectedCustomizations)
         {
             var cart = GetCart();
-            var item = cart.FirstOrDefault(x => x.MenuItemId == menuItemId);
+            var item = cart.FirstOrDefault(x =>
+                x.MenuItemId == menuItemId &&
+                x.SelectedCustomizations == selectedCustomizations);
 
             if (item != null)
             {
@@ -63,10 +91,12 @@ namespace Ceng382_25_26_202311031.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateQuantity(int menuItemId, int quantity)
+        public IActionResult UpdateQuantity(int menuItemId, string selectedCustomizations, int quantity)
         {
             var cart = GetCart();
-            var item = cart.FirstOrDefault(x => x.MenuItemId == menuItemId);
+            var item = cart.FirstOrDefault(x =>
+                x.MenuItemId == menuItemId &&
+                x.SelectedCustomizations == selectedCustomizations);
 
             if (item != null)
             {
@@ -95,40 +125,6 @@ namespace Ceng382_25_26_202311031.Controllers
         {
             var cartJson = JsonSerializer.Serialize(cart);
             HttpContext.Session.SetString(CartSessionKey, cartJson);
-        }
-
-        private List<MenuItem> GetSampleMenuItems()
-        {
-            return new List<MenuItem>
-            {
-                new MenuItem
-                {
-                    Id = 1,
-                    Name = "Chicken Wrap",
-                    Description = "Grilled chicken wrap with fries",
-                    Price = 180,
-                    ImageUrl = "/images/food1.jpg",
-                    CatererName = "Taste Kitchen"
-                },
-                new MenuItem
-                {
-                    Id = 2,
-                    Name = "Cheese Burger",
-                    Description = "Burger with cheddar and special sauce",
-                    Price = 220,
-                    ImageUrl = "/images/food2.jpg",
-                    CatererName = "Burger House"
-                },
-                new MenuItem
-                {
-                    Id = 3,
-                    Name = "Pasta Alfredo",
-                    Description = "Creamy alfredo pasta with mushrooms",
-                    Price = 200,
-                    ImageUrl = "/images/food3.jpg",
-                    CatererName = "Italian Spoon"
-                }
-            };
         }
     }
 }

@@ -1,2 +1,48 @@
-<h2>Admin Dashboard</h2>
-<p>Admin can monitor users, caterers, menus, and logs.</p>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Monitor users, menus, orders, revenue, and system activity.</p>
+</section>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>Total Users</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalUsers</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Menus</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalMenus</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Orders</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalOrders</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Total Revenue</h3>
+        <p style="font-size:32px;font-weight:800;">@ViewBag.TotalRevenue.ToString("0.00") ₺</p>
+    </div>
+</div>
+
+<div class="feature-card" style="margin-top:25px;">
+    <h3>Admin Shortcuts</h3>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;">
+        <a asp-controller="Logs" asp-action="Index" class="menu-btn">
+            View System Logs
+        </a>
+
+        <a asp-controller="Menu" asp-action="Manage" class="hero-btn secondary-btn">
+            Manage Menus
+        </a>
+
+        <a asp-controller="Orders" asp-action="Index" class="hero-btn secondary-btn">
+            View Orders
+        </a>
+    </div>
+</div>

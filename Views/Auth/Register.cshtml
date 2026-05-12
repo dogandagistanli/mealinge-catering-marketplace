@@ -1,0 +1,48 @@
+@model Ceng382_25_26_202311031.Models.RegisterViewModel
+
+<section class="page-header">
+    <h1 class="page-title">Create Account</h1>
+    <p class="page-subtitle">
+        Join Mealinge today.
+    </p>
+</section>
+
+<div class="feature-card auth-card">
+
+    <form asp-action="Register" method="post">
+
+        <div asp-validation-summary="All"
+             class="text-danger"
+             style="margin-bottom:20px;">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+
+            <input asp-for="FullName"
+                   class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Email</label>
+
+            <input asp-for="Email"
+                   class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Password</label>
+
+            <input asp-for="Password"
+                   type="password"
+                   class="form-control" />
+        </div>
+
+        <button type="submit"
+                class="menu-btn">
+            Create Account
+        </button>
+
+    </form>
+
+</div>

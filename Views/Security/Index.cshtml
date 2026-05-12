@@ -1,0 +1,31 @@
+@model Ceng382_25_26_202311031.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Security Settings";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Security Settings</h1>
+    <p class="page-subtitle">Manage account security and email-based two-factor authentication.</p>
+</section>
+
+<div class="feature-card" style="max-width:760px;">
+    <h3>Email Two-Factor Authentication</h3>
+
+    <p>
+        Current Status:
+        <strong>
+            @(Model.EmailTwoFactorEnabled ? "Enabled" : "Disabled")
+        </strong>
+    </p>
+
+    <p style="margin-top:12px;">
+        When enabled, Mealinge sends a verification code to the user's email record before completing login.
+    </p>
+
+    <form asp-action="ToggleEmailTwoFactor" method="post" style="margin-top:20px;">
+        <button type="submit" class="menu-btn">
+            @(Model.EmailTwoFactorEnabled ? "Disable Email 2FA" : "Enable Email 2FA")
+        </button>
+    </form>
+</div>

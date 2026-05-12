@@ -1,0 +1,58 @@
+@model List<Ceng382_25_26_202311031.Models.AppLog>
+
+@{
+    ViewData["Title"] = "System Logs";
+}
+
+<section class="page-header">
+    <h1 class="page-title">System Logs</h1>
+
+    <p class="page-subtitle">
+        Monitor platform activity and recent operations.
+    </p>
+</section>
+
+@if (!Model.Any())
+{
+    <div class="empty-box">
+        <p>No logs found.</p>
+    </div>
+}
+else
+{
+    <div class="cart-table-wrapper">
+
+        <table class="cart-table">
+
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>User</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var log in Model)
+                {
+                    <tr>
+
+                        <td>@log.Action</td>
+
+                        <td>@log.UserEmail</td>
+
+                        <td>@log.Description</td>
+
+                        <td>@log.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}

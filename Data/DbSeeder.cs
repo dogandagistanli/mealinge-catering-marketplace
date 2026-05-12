@@ -32,6 +32,7 @@ namespace Ceng382_25_26_202311031.Data
                 };
 
                 var result = await userManager.CreateAsync(admin, "123456");
+
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, "Admin");
@@ -46,10 +47,13 @@ namespace Ceng382_25_26_202311031.Data
                     Email = "caterer1@mealinge.com",
                     FullName = "Taste Kitchen",
                     RoleDisplayName = "Caterer",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    Latitude = 39.9208,
+                    Longitude = 32.8541
                 };
 
                 var result = await userManager.CreateAsync(caterer1, "123456");
+
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(caterer1, "Caterer");
@@ -68,11 +72,23 @@ namespace Ceng382_25_26_202311031.Data
                 };
 
                 var result = await userManager.CreateAsync(user1, "123456");
+
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user1, "User");
                 }
             }
-        }
+            var personalUser = await userManager.FindByEmailAsync("dogandagistanli@gmail.com");
+
+if (personalUser != null)
+{
+    if (!await userManager.IsInRoleAsync(personalUser, "User"))
+    {
+        await userManager.AddToRoleAsync(personalUser, "User");
     }
+}
+        }
+        
+    }
+    
 }

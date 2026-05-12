@@ -1,0 +1,86 @@
+@{
+    ViewData["Title"] = "Nearby Kitchens";
+    var apiKey = ViewBag.GoogleMapsApiKey;
+    var caterersJson = System.Text.Json.JsonSerializer.Serialize(ViewBag.Caterers);
+}
+
+<section class="page-header">
+    <h1 class="page-title">Nearby Kitchens</h1>
+    <p class="page-subtitle">Find caterers around your location using Google Maps.</p>
+</section>
+
+<div class="feature-card" style="margin-bottom:25px;">
+    <button onclick="findUserLocation()" class="menu-btn">
+        Find My Location
+    </button>
+
+    <p style="margin-top:15px;">
+        This page uses Google Maps API and browser location to display nearby caterers.
+    </p>
+</div>
+
+<div class="feature-card">
+    <div id="map" style="height:500px;border-radius:18px;"></div>
+</div>
+
+@section Scripts {
+    <script>
+        const caterers = @Html.Raw(caterersJson);
+
+        let map;
+        let userMarker;
+
+        function initMap() {
+            const defaultLocation = { lat: 39.9208, lng: 32.8541 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLocation,
+                zoom: 12
+            });
+
+            caterers.forEach(caterer => {
+                const position = {
+                    lat: Number(caterer.Latitude),
+                    lng: Number(caterer.Longitude)
+                };
+
+                new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: caterer.FullName
+                });
+            });
+        }
+
+        function findUserLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by this browser.");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                map.setCenter(userLocation);
+                map.setZoom(13);
+
+                if (userMarker) {
+                    userMarker.setMap(null);
+                }
+
+                userMarker = new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    title: "Your Location"
+                });
+            });
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=@apiKey&callback=initMap">
+    </script>
+}

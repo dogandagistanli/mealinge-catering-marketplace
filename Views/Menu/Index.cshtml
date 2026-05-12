@@ -6,12 +6,34 @@
 
 <section class="page-header">
     <h1 class="page-title">Menus</h1>
-    <p class="page-subtitle">Browse available meals and add them to your cart.</p>
+    <p class="page-subtitle">Browse meals, select customizations, and add them to your cart.</p>
 </section>
+
+<div class="feature-card" style="margin-bottom:25px;">
+    <form method="get" asp-action="Index" style="display:flex;gap:15px;flex-wrap:wrap;align-items:end;">
+        <div class="form-group" style="flex:1;min-width:250px;">
+            <label>Search Menu</label>
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search meals..." />
+        </div>
+
+        <div class="form-group" style="flex:1;min-width:250px;">
+            <label>Caterer</label>
+            <input type="text" name="caterer" value="@ViewBag.Caterer" class="form-control" placeholder="Search caterers..." />
+        </div>
+
+        <button type="submit" class="menu-btn" style="height:50px;">Search</button>
+    </form>
+</div>
 
 <div class="menu-grid">
     @foreach (var item in Model)
     {
+        var ratings = item.Ratings?.ToList();
+        var hasRatings = ratings != null && ratings.Any();
+        var avgMenu = hasRatings ? ratings!.Average(x => x.MenuItemScore) : 0;
+        var avgCaterer = hasRatings ? ratings!.Average(x => x.CatererScore) : 0;
+        var groups = item.CustomizationOptions?.GroupBy(x => x.GroupName).ToList();
+
         <div class="menu-card">
             <img class="menu-image" src="@(string.IsNullOrWhiteSpace(item.ImageUrl) ? "/images/food-hero-1.jpg" : item.ImageUrl)" alt="@item.Name" />
 
@@ -22,10 +44,48 @@
                 </div>
 
                 <p class="menu-caterer"><strong>Caterer:</strong> @item.CatererName</p>
+
+                @if (hasRatings)
+                {
+                    <p><strong>Menu Rating:</strong> @avgMenu.ToString("0.0") / 5</p>
+                    <p><strong>Caterer Rating:</strong> @avgCaterer.ToString("0.0") / 5</p>
+                }
+                else
+                {
+                    <p>No ratings yet.</p>
+                }
+
                 <p class="menu-description">@item.Description</p>
 
                 <form asp-controller="Cart" asp-action="AddToCart" method="post">
                     <input type="hidden" name="menuItemId" value="@item.Id" />
+
+                    @if (groups != null && groups.Any())
+                    {
+                        <div style="margin:15px 0;">
+                            <strong>Customizations</strong>
+
+                            @foreach (var group in groups)
+                            {
+                                <div style="margin-top:10px;">
+                                    <p style="margin-bottom:6px;font-weight:700;">@group.Key</p>
+
+                                    @foreach (var option in group)
+                                    {
+                                        <label style="display:block;margin-bottom:6px;">
+                                            <input type="checkbox" name="selectedOptions" value="@option.Id" />
+                                            @option.OptionName
+                                            @if (option.PriceChange > 0)
+                                            {
+                                                <span>(+@option.PriceChange ₺)</span>
+                                            }
+                                        </label>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+
                     <button type="submit" class="menu-btn">Add to Cart</button>
                 </form>
             </div>

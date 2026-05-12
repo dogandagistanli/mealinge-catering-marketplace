@@ -9,6 +9,10 @@ namespace Ceng382_25_26_202311031.Models
         public int Quantity { get; set; }
         public string Description { get; set; } = "";
 
-        public decimal TotalPrice => UnitPrice * Quantity;
+        public string SelectedCustomizations { get; set; } = "";
+        public decimal CustomizationPrice { get; set; }
+
+        public decimal FinalUnitPrice => UnitPrice + CustomizationPrice;
+        public decimal TotalPrice => FinalUnitPrice * Quantity;
     }
 }

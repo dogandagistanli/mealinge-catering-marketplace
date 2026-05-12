@@ -12,8 +12,12 @@ namespace Ceng382_25_26_202311031.Models
         public string CatererName { get; set; } = "";
 
         public decimal UnitPrice { get; set; }
+        public decimal CustomizationPrice { get; set; }
+        public string SelectedCustomizations { get; set; } = "";
+
         public int Quantity { get; set; }
 
-        public decimal Subtotal => UnitPrice * Quantity;
+        public decimal FinalUnitPrice => UnitPrice + CustomizationPrice;
+        public decimal Subtotal => FinalUnitPrice * Quantity;
     }
 }

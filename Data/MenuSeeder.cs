@@ -18,7 +18,7 @@ namespace Ceng382_25_26_202311031.Data
                     Name = "Chicken Wrap",
                     Description = "Grilled chicken wrap with fries",
                     Price = 180,
-                    ImageUrl = "/images/food1.jpg",
+                    ImageUrl = "/images/chicken-wrap.jpg",
                     CatererName = "Taste Kitchen"
                 },
                 new MenuItem
@@ -26,7 +26,7 @@ namespace Ceng382_25_26_202311031.Data
                     Name = "Cheese Burger",
                     Description = "Burger with cheddar and special sauce",
                     Price = 220,
-                    ImageUrl = "/images/food2.jpg",
+                    ImageUrl = "/images/cheese-burger.jpg",
                     CatererName = "Burger House"
                 },
                 new MenuItem
@@ -34,7 +34,7 @@ namespace Ceng382_25_26_202311031.Data
                     Name = "Pasta Alfredo",
                     Description = "Creamy alfredo pasta with mushrooms",
                     Price = 200,
-                    ImageUrl = "/images/food3.jpg",
+                    ImageUrl = "/images/pasta-alfredo.jpg",
                     CatererName = "Italian Spoon"
                 }
             );

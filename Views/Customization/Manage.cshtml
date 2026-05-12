@@ -1,0 +1,76 @@
+@model Ceng382_25_26_202311031.Models.MenuItem
+
+@{
+    ViewData["Title"] = "Manage Customizations";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Manage Customizations</h1>
+    <p class="page-subtitle">Define dynamic options for @Model.Name.</p>
+</section>
+
+<div class="feature-card" style="margin-bottom:25px;">
+    <h3>Add Customization Option</h3>
+
+    <form asp-action="Add" method="post" style="display:grid;gap:15px;margin-top:18px;">
+        <input type="hidden" name="menuItemId" value="@Model.Id" />
+
+        <div class="form-group">
+            <label>Group Name</label>
+            <input name="groupName" class="form-control" placeholder="Sauces, Removable Ingredients, Extras" required />
+        </div>
+
+        <div class="form-group">
+            <label>Option Name</label>
+            <input name="optionName" class="form-control" placeholder="No onion, Extra cheese, BBQ sauce" required />
+        </div>
+
+        <div class="form-group">
+            <label>Option Type</label>
+            <select name="optionType" class="form-control">
+                <option value="Removable">Removable Ingredient</option>
+                <option value="Addition">Optional Addition</option>
+                <option value="Group">Grouped Option</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Price Change</label>
+            <input name="priceChange" type="number" step="0.01" value="0" class="form-control" />
+        </div>
+
+        <button type="submit" class="menu-btn">Add Option</button>
+    </form>
+</div>
+
+<div class="cart-table-wrapper">
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th>Option</th>
+                <th>Type</th>
+                <th>Price Change</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var option in Model.CustomizationOptions ?? new List<CustomizationOption>())
+            {
+                <tr>
+                    <td>@option.GroupName</td>
+                    <td>@option.OptionName</td>
+                    <td>@option.OptionType</td>
+                    <td>@option.PriceChange ₺</td>
+                    <td>
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" name="id" value="@option.Id" />
+                            <button type="submit" class="danger-btn">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

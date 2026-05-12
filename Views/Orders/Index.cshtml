@@ -22,26 +22,53 @@ else
         {
             <div class="feature-card" style="margin-bottom:20px;">
                 <h3>Order #@order.Id</h3>
+
                 <p><strong>Date:</strong> @order.OrderDate</p>
                 <p><strong>Status:</strong> @order.Status</p>
                 <p><strong>Total:</strong> @order.TotalAmount ₺</p>
+
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+                    <a asp-controller="Ratings"
+                       asp-action="Create"
+                       asp-route-orderId="@order.Id"
+                       class="menu-btn">
+                        Rate Order
+                    </a>
+
+                    <a asp-controller="Orders"
+                       asp-action="Receipt"
+                       asp-route-id="@order.Id"
+                       class="hero-btn secondary-btn">
+                        Download Receipt
+                    </a>
+
+                    <a asp-controller="Orders"
+                       asp-action="Agreement"
+                       asp-route-id="@order.Id"
+                       class="hero-btn secondary-btn">
+                        Download Agreement
+                    </a>
+                </div>
 
                 <table class="cart-table">
                     <thead>
                         <tr>
                             <th>Item</th>
                             <th>Caterer</th>
+                            <th>Customizations</th>
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach (var item in order.OrderItems)
                         {
                             <tr>
                                 <td>@item.MenuItemName</td>
                                 <td>@item.CatererName</td>
+                                <td>@item.SelectedCustomizations</td>
                                 <td>@item.UnitPrice ₺</td>
                                 <td>@item.Quantity</td>
                                 <td>@item.Subtotal ₺</td>

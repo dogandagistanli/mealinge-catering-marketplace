@@ -1,4 +1,5 @@
 using Ceng382_25_26_202311031.Data;
+using Ceng382_25_26_202311031.Services;
 using Ceng382_25_26_202311031.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<EmailService>();
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<SimplePdfService>();
 builder.Services.AddRazorPages();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -42,6 +46,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
@@ -59,6 +64,7 @@ app.MapRazorPages();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     await DbSeeder.SeedRolesAndUsersAsync(services);
     await MenuSeeder.SeedMenusAsync(services);
 }

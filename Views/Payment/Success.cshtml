@@ -4,9 +4,37 @@
 
 <section class="page-header">
     <h1 class="page-title">Payment Successful</h1>
-    <p class="page-subtitle">Your order has been completed successfully and your cart has been cleared.</p>
+
+    <p class="page-subtitle">
+        Your order has been completed successfully.
+    </p>
 </section>
 
-<div class="empty-box">
-    <a asp-controller="Orders" asp-action="Index" class="menu-btn">View Orders</a>
+<div class="feature-card" style="max-width:700px;">
+
+    <h3 style="margin-bottom:20px;">
+        Thank you for choosing Mealinge.
+    </h3>
+
+    <p style="margin-bottom:20px;">
+        Your payment simulation has been completed and
+        your order has been saved into the system.
+    </p>
+
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+
+        <a asp-controller="Orders"
+           asp-action="Index"
+           class="menu-btn">
+            View Orders
+        </a>
+
+        <a asp-controller="Menu"
+           asp-action="Index"
+           class="hero-btn secondary-btn">
+            Continue Shopping
+        </a>
+
+    </div>
+
 </div>

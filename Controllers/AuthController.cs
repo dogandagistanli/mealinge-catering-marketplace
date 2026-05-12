@@ -1,0 +1,194 @@
+using Ceng382_25_26_202311031.Data;
+using Ceng382_25_26_202311031.Models;
+using Ceng382_25_26_202311031.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace Ceng382_25_26_202311031.Controllers
+{
+    public class AuthController : Controller
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
+
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context,
+            EmailService emailService)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _context = context;
+            _emailService = emailService;
+        }
+
+        public IActionResult Login()
+        {
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+
+            if (!passwordValid)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
+            if (user.EmailTwoFactorEnabled)
+            {
+                var code = Random.Shared.Next(100000, 999999).ToString();
+
+                _context.TwoFactorCodes.Add(new TwoFactorCode
+                {
+                    UserId = user.Id,
+                    Code = code,
+                    ExpiresAt = DateTime.Now.AddMinutes(5),
+                    IsUsed = false
+                });
+
+                await _context.SaveChangesAsync();
+
+                await _emailService.SendAsync(
+                    user.Email ?? "",
+                    "Mealinge Two-Factor Login Code",
+                    $"Your Mealinge login verification code is: {code}\n\nThis code expires in 5 minutes.");
+
+                HttpContext.Session.SetString("TwoFactorUserId", user.Id);
+
+                return RedirectToAction("VerifyTwoFactor");
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+        public IActionResult VerifyTwoFactor()
+        {
+            return View(new TwoFactorLoginViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyTwoFactor(TwoFactorLoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userId = HttpContext.Session.GetString("TwoFactorUserId");
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return RedirectToAction("Login");
+
+            var codeRecord = await _context.TwoFactorCodes
+                .Where(x => x.UserId == userId && x.Code == model.Code && !x.IsUsed)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            if (codeRecord == null || codeRecord.ExpiresAt < DateTime.Now)
+            {
+                ModelState.AddModelError("", "Invalid or expired verification code.");
+                return View(model);
+            }
+
+            codeRecord.IsUsed = true;
+
+            await _context.SaveChangesAsync();
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return RedirectToAction("Login");
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            HttpContext.Session.Remove("TwoFactorUserId");
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("", "This email is already registered.");
+                return View(model);
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FullName = model.FullName,
+                RoleDisplayName = "User",
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+{
+    user.EmailTwoFactorEnabled = true;
+    await _userManager.UpdateAsync(user);
+
+    await _userManager.AddToRoleAsync(user, "User");
+
+    return RedirectToAction("Login");
+}
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View(model);
+            }
+
+            await _userManager.AddToRoleAsync(user, "User");
+
+            await _signInManager.SignInAsync(user, false);
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Index", "Home");
+        }
+    }
+}

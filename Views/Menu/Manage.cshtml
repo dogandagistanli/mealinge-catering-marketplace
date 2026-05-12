@@ -1,0 +1,80 @@
+@model List<Ceng382_25_26_202311031.Models.MenuItem>
+
+@{
+    ViewData["Title"] = "Manage Menus";
+}
+
+<section class="page-header">
+    <h1 class="page-title">Manage Menu Items</h1>
+    <p class="page-subtitle">Create, edit, and organize your catering menus.</p>
+</section>
+
+<div style="margin-bottom:20px;">
+    <a asp-action="Create" class="menu-btn">Create New Menu</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-box">
+        <p>No menu items found.</p>
+    </div>
+}
+else
+{
+    <div class="cart-table-wrapper">
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Caterer</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item.ImageUrl"
+                                 style="width:110px;height:80px;object-fit:cover;border-radius:10px;" />
+                        </td>
+
+                        <td>@item.Name</td>
+                        <td>@item.CatererName</td>
+                        <td>@item.Price ₺</td>
+
+                        <td>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.Id"
+                                   class="small-btn">
+                                    Edit
+                                </a>
+
+                                <a asp-controller="Customization"
+                                   asp-action="Manage"
+                                   asp-route-menuItemId="@item.Id"
+                                   class="small-btn">
+                                    Options
+                                </a>
+
+                                <form asp-action="Delete" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+
+                                    <button type="submit" class="danger-btn">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

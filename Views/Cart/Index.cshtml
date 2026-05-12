@@ -7,7 +7,7 @@
 
 <section class="page-header">
     <h1 class="page-title">Your Cart</h1>
-    <p class="page-subtitle">Review selected items before checkout.</p>
+    <p class="page-subtitle">Review selected items and customizations before checkout.</p>
 </section>
 
 @if (!Model.Any())
@@ -25,30 +25,38 @@ else
                 <tr>
                     <th>Item</th>
                     <th>Caterer</th>
-                    <th>Price</th>
+                    <th>Customizations</th>
+                    <th>Unit Price</th>
                     <th>Quantity</th>
                     <th>Subtotal</th>
                     <th>Action</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var item in Model)
                 {
                     <tr>
                         <td>@item.Name</td>
                         <td>@item.CatererName</td>
-                        <td>@item.UnitPrice ₺</td>
+                        <td>@item.SelectedCustomizations</td>
+                        <td>@item.FinalUnitPrice ₺</td>
+
                         <td>
                             <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="qty-form">
                                 <input type="hidden" name="menuItemId" value="@item.MenuItemId" />
+                                <input type="hidden" name="selectedCustomizations" value="@item.SelectedCustomizations" />
                                 <input type="number" name="quantity" value="@item.Quantity" min="1" />
                                 <button type="submit" class="small-btn">Update</button>
                             </form>
                         </td>
+
                         <td>@item.TotalPrice ₺</td>
+
                         <td>
                             <form asp-controller="Cart" asp-action="Remove" method="post">
                                 <input type="hidden" name="menuItemId" value="@item.MenuItemId" />
+                                <input type="hidden" name="selectedCustomizations" value="@item.SelectedCustomizations" />
                                 <button type="submit" class="danger-btn">Remove</button>
                             </form>
                         </td>
