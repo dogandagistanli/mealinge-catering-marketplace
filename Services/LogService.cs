@@ -26,6 +26,7 @@ namespace Ceng382_25_26_202311031.Services
             };
 
             _context.AppLogs.Add(log);
+
             await _context.SaveChangesAsync();
         }
     }

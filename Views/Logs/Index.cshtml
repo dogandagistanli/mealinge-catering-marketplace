@@ -12,6 +12,34 @@
     </p>
 </section>
 
+<div class="feature-card" style="margin-bottom:25px;">
+
+    <form method="get"
+          asp-action="Index"
+          style="display:flex;gap:15px;align-items:end;flex-wrap:wrap;">
+
+        <div class="form-group" style="flex:1;min-width:250px;">
+
+            <label>Search Logs</label>
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Search logs..." />
+
+        </div>
+
+        <button type="submit"
+                class="menu-btn"
+                style="height:50px;">
+            Search
+        </button>
+
+    </form>
+
+</div>
+
 @if (!Model.Any())
 {
     <div class="empty-box">
@@ -53,6 +81,34 @@ else
             </tbody>
 
         </table>
+
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:15px;margin-top:25px;">
+
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               asp-route-search="@ViewBag.Search"
+               class="small-btn">
+                Previous
+            </a>
+        }
+
+        <span style="padding:10px 16px;">
+            Page @ViewBag.CurrentPage / @ViewBag.TotalPages
+        </span>
+
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               asp-route-search="@ViewBag.Search"
+               class="small-btn">
+                Next
+            </a>
+        }
 
     </div>
 }

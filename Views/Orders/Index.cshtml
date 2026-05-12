@@ -18,9 +18,11 @@
 else
 {
     <div class="cart-table-wrapper">
+
         @foreach (var order in Model)
         {
             <div class="feature-card" style="margin-bottom:20px;">
+
                 <h3>Order #@order.Id</h3>
 
                 <p><strong>Date:</strong> @order.OrderDate</p>
@@ -28,6 +30,7 @@ else
                 <p><strong>Total:</strong> @order.TotalAmount ₺</p>
 
                 <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+
                     <a asp-controller="Ratings"
                        asp-action="Create"
                        asp-route-orderId="@order.Id"
@@ -48,9 +51,11 @@ else
                        class="hero-btn secondary-btn">
                         Download Agreement
                     </a>
+
                 </div>
 
                 <table class="cart-table">
+
                     <thead>
                         <tr>
                             <th>Item</th>
@@ -63,20 +68,58 @@ else
                     </thead>
 
                     <tbody>
+
                         @foreach (var item in order.OrderItems)
                         {
                             <tr>
+
                                 <td>@item.MenuItemName</td>
+
                                 <td>@item.CatererName</td>
+
                                 <td>@item.SelectedCustomizations</td>
+
                                 <td>@item.UnitPrice ₺</td>
+
                                 <td>@item.Quantity</td>
+
                                 <td>@item.Subtotal ₺</td>
+
                             </tr>
                         }
+
                     </tbody>
+
                 </table>
+
             </div>
         }
+
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:15px;margin-top:25px;">
+
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               class="small-btn">
+                Previous
+            </a>
+        }
+
+        <span style="padding:10px 16px;">
+            Page @ViewBag.CurrentPage / @ViewBag.TotalPages
+        </span>
+
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               class="small-btn">
+                Next
+            </a>
+        }
+
     </div>
 }

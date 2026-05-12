@@ -10,20 +10,31 @@ namespace Ceng382_25_26_202311031.Controllers
     public class AuthController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+
         private readonly SignInManager<ApplicationUser> _signInManager;
+
         private readonly ApplicationDbContext _context;
+
         private readonly EmailService _emailService;
+
+        private readonly LogService _logService;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext context,
-            EmailService emailService)
+            EmailService emailService,
+            LogService logService)
         {
             _userManager = userManager;
+
             _signInManager = signInManager;
+
             _context = context;
+
             _emailService = emailService;
+
+            _logService = logService;
         }
 
         public IActionResult Login()
@@ -37,33 +48,57 @@ namespace Ceng382_25_26_202311031.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user =
+                await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Invalid login attempt.");
+                await _logService.LogAsync(
+                    "FAILED LOGIN",
+                    model.Email,
+                    "Login failed because user was not found.");
+
+                ModelState.AddModelError(
+                    "",
+                    "Invalid login attempt.");
+
                 return View(model);
             }
 
-            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            var passwordValid =
+                await _userManager.CheckPasswordAsync(
+                    user,
+                    model.Password);
 
             if (!passwordValid)
             {
-                ModelState.AddModelError("", "Invalid login attempt.");
+                await _logService.LogAsync(
+                    "FAILED LOGIN",
+                    user.Email,
+                    "Login failed because password was incorrect.");
+
+                ModelState.AddModelError(
+                    "",
+                    "Invalid login attempt.");
+
                 return View(model);
             }
 
             if (user.EmailTwoFactorEnabled)
             {
-                var code = Random.Shared.Next(100000, 999999).ToString();
+                var code =
+                    Random.Shared
+                    .Next(100000, 999999)
+                    .ToString();
 
-                _context.TwoFactorCodes.Add(new TwoFactorCode
-                {
-                    UserId = user.Id,
-                    Code = code,
-                    ExpiresAt = DateTime.Now.AddMinutes(5),
-                    IsUsed = false
-                });
+                _context.TwoFactorCodes.Add(
+                    new TwoFactorCode
+                    {
+                        UserId = user.Id,
+                        Code = code,
+                        ExpiresAt = DateTime.Now.AddMinutes(5),
+                        IsUsed = false
+                    });
 
                 await _context.SaveChangesAsync();
 
@@ -72,14 +107,26 @@ namespace Ceng382_25_26_202311031.Controllers
                     "Mealinge Two-Factor Login Code",
                     $"Your Mealinge login verification code is: {code}\n\nThis code expires in 5 minutes.");
 
-                HttpContext.Session.SetString("TwoFactorUserId", user.Id);
+                HttpContext.Session.SetString(
+                    "TwoFactorUserId",
+                    user.Id);
 
-                return RedirectToAction("VerifyTwoFactor");
+                return RedirectToAction(
+                    "VerifyTwoFactor");
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            await _signInManager.SignInAsync(
+                user,
+                isPersistent: false);
 
-            return RedirectToAction("Index", "Dashboard");
+            await _logService.LogAsync(
+                "SUCCESS LOGIN",
+                user.Email,
+                "User logged into the system.");
+
+            return RedirectToAction(
+                "Index",
+                "Dashboard");
         }
 
         public IActionResult VerifyTwoFactor()
@@ -88,24 +135,37 @@ namespace Ceng382_25_26_202311031.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> VerifyTwoFactor(TwoFactorLoginViewModel model)
+        public async Task<IActionResult> VerifyTwoFactor(
+            TwoFactorLoginViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var userId = HttpContext.Session.GetString("TwoFactorUserId");
+            var userId =
+                HttpContext.Session
+                .GetString("TwoFactorUserId");
 
             if (string.IsNullOrWhiteSpace(userId))
+            {
                 return RedirectToAction("Login");
+            }
 
-            var codeRecord = await _context.TwoFactorCodes
-                .Where(x => x.UserId == userId && x.Code == model.Code && !x.IsUsed)
+            var codeRecord =
+                await _context.TwoFactorCodes
+                .Where(x =>
+                    x.UserId == userId &&
+                    x.Code == model.Code &&
+                    !x.IsUsed)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefaultAsync();
 
-            if (codeRecord == null || codeRecord.ExpiresAt < DateTime.Now)
+            if (codeRecord == null ||
+                codeRecord.ExpiresAt < DateTime.Now)
             {
-                ModelState.AddModelError("", "Invalid or expired verification code.");
+                ModelState.AddModelError(
+                    "",
+                    "Invalid or expired verification code.");
+
                 return View(model);
             }
 
@@ -113,82 +173,52 @@ namespace Ceng382_25_26_202311031.Controllers
 
             await _context.SaveChangesAsync();
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user =
+                await _userManager.FindByIdAsync(userId);
 
             if (user == null)
+            {
                 return RedirectToAction("Login");
-
-            await _signInManager.SignInAsync(user, isPersistent: false);
-
-            HttpContext.Session.Remove("TwoFactorUserId");
-
-            return RedirectToAction("Index", "Dashboard");
-        }
-
-        public IActionResult Register()
-        {
-            return View(new RegisterViewModel());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var existingUser = await _userManager.FindByEmailAsync(model.Email);
-
-            if (existingUser != null)
-            {
-                ModelState.AddModelError("", "This email is already registered.");
-                return View(model);
             }
 
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FullName = model.FullName,
-                RoleDisplayName = "User",
-                EmailConfirmed = true
-            };
+            await _signInManager.SignInAsync(
+                user,
+                isPersistent: false);
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-{
-    user.EmailTwoFactorEnabled = true;
-    await _userManager.UpdateAsync(user);
+            await _logService.LogAsync(
+                "SUCCESS TWO FACTOR LOGIN",
+                user.Email,
+                "User completed two-factor authentication.");
 
-    await _userManager.AddToRoleAsync(user, "User");
+            HttpContext.Session.Remove(
+                "TwoFactorUserId");
 
-    return RedirectToAction("Login");
-}
-
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-
-                return View(model);
-            }
-
-            await _userManager.AddToRoleAsync(user, "User");
-
-            await _signInManager.SignInAsync(user, false);
-
-            return RedirectToAction("Index", "Dashboard");
+            return RedirectToAction(
+                "Index",
+                "Dashboard");
         }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+            var user =
+                await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                await _logService.LogAsync(
+                    "LOGOUT",
+                    user.Email,
+                    "User logged out from the system.");
+            }
+
             await _signInManager.SignOutAsync();
 
             HttpContext.Session.Clear();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(
+                "Index",
+                "Home");
         }
     }
 }
