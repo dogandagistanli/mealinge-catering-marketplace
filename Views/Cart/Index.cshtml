@@ -40,7 +40,7 @@ else
                         <td>@item.Name</td>
                         <td>@item.CatererName</td>
                         <td>@item.SelectedCustomizations</td>
-                        <td>@item.FinalUnitPrice ₺</td>
+                        <td>@item.FinalUnitPrice TL</td>
 
                         <td>
                             <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="qty-form">
@@ -51,7 +51,7 @@ else
                             </form>
                         </td>
 
-                        <td>@item.TotalPrice ₺</td>
+                        <td>@item.TotalPrice TL</td>
 
                         <td>
                             <form asp-controller="Cart" asp-action="Remove" method="post">
@@ -66,7 +66,7 @@ else
         </table>
 
         <div class="cart-summary">
-            <h3>Total: @total ₺</h3>
+            <h3>Total: @total TL</h3>
             <a asp-controller="Payment" asp-action="Checkout" class="menu-btn">Proceed to Payment</a>
         </div>
     </div>

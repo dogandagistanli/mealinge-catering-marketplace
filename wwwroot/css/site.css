@@ -723,14 +723,15 @@ body.dark-theme .footer {
 }
 .form-control:disabled,
 .form-control[readonly] {
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--panel-2);
+    color: var(--text);
+    border-color: var(--border);
     opacity: 1;
 }
 
 .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--muted);
+    opacity: 0.8;
 }
 .auth-card {
     max-width: 520px;
@@ -750,7 +751,7 @@ body.dark-theme .footer {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.06);
-    color: inherit;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text);
 }

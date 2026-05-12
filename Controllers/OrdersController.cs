@@ -14,15 +14,18 @@ namespace Ceng382_25_26_202311031.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SimplePdfService _pdfService;
+        private readonly LogService _logService;
 
         public OrdersController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            SimplePdfService pdfService)
+            SimplePdfService pdfService,
+            LogService logService)
         {
             _context = context;
             _userManager = userManager;
             _pdfService = pdfService;
+            _logService = logService;
         }
 
         public async Task<IActionResult> Index(int page = 1)
@@ -32,8 +35,27 @@ namespace Ceng382_25_26_202311031.Controllers
             int pageSize = 5;
 
             var query = _context.Orders
+                .Include(x => x.User)
                 .Include(x => x.OrderItems)
-                .Where(x => x.UserId == user!.Id);
+                .AsQueryable();
+
+            if (User.IsInRole("Admin"))
+            {
+                ViewBag.OrderScope = "All Orders";
+            }
+            else if (User.IsInRole("Caterer"))
+            {
+                query = query.Where(x => x.OrderItems.Any(item =>
+                    item.CatererId == user!.Id ||
+                    ((item.CatererId == null || item.CatererId == "") && item.CatererName == user!.FullName)));
+
+                ViewBag.OrderScope = "Caterer Orders";
+            }
+            else
+            {
+                query = query.Where(x => x.UserId == user!.Id);
+                ViewBag.OrderScope = "My Orders";
+            }
 
             int totalOrders = await query.CountAsync();
 
@@ -47,6 +69,7 @@ namespace Ceng382_25_26_202311031.Controllers
 
             ViewBag.TotalPages =
                 (int)Math.Ceiling(totalOrders / (double)pageSize);
+            ViewBag.CurrentUserId = user?.Id;
 
             return View(orders);
         }
@@ -89,6 +112,12 @@ namespace Ceng382_25_26_202311031.Controllers
                 _pdfService.CreatePdf(
                     "Mealinge Order Receipt",
                     lines);
+
+            var user = await _userManager.GetUserAsync(User);
+            await _logService.LogAsync(
+                "PDF",
+                user?.Email,
+                $"Receipt PDF was generated for Order #{order.Id}.");
 
             return File(
                 pdf,
@@ -135,6 +164,12 @@ namespace Ceng382_25_26_202311031.Controllers
                 _pdfService.CreatePdf(
                     "Mealinge Customer Agreement",
                     lines);
+
+            var user = await _userManager.GetUserAsync(User);
+            await _logService.LogAsync(
+                "PDF",
+                user?.Email,
+                $"Agreement PDF was generated for Order #{order.Id}.");
 
             return File(
                 pdf,

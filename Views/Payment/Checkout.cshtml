@@ -34,14 +34,16 @@
                 <div style="margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);">
                     <strong>@item.Name</strong>
                     <br />
-                    <span>@item.Quantity x @item.UnitPrice ₺</span>
+                    <span>@item.Quantity x @item.FinalUnitPrice TL</span>
                     <br />
                     <span>Caterer: @item.CatererName</span>
+                    <br />
+                    <span>Customizations: @item.SelectedCustomizations</span>
                 </div>
             }
         }
 
-        <h3>Total: @total ₺</h3>
+        <h3>Total: @total TL</h3>
 
     </div>
 

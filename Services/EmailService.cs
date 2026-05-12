@@ -25,33 +25,54 @@ namespace Ceng382_25_26_202311031.Services
         {
             var senderEmail = _configuration["EmailSettings:SenderEmail"];
             var senderPassword = _configuration["EmailSettings:SenderPassword"];
+            var deliveryStatus = "Email sent through SMTP.";
 
-            using var client = new SmtpClient("smtp.gmail.com", 587)
+            try
             {
-                Credentials = new NetworkCredential(
-                    senderEmail,
-                    senderPassword),
+                var hasRealSettings =
+                    !string.IsNullOrWhiteSpace(senderEmail) &&
+                    !string.IsNullOrWhiteSpace(senderPassword) &&
+                    !senderEmail.Contains("YOUR_", StringComparison.OrdinalIgnoreCase) &&
+                    !senderPassword.Contains("YOUR_", StringComparison.OrdinalIgnoreCase);
 
-                EnableSsl = true
-            };
+                if (hasRealSettings)
+                {
+                    using var client = new SmtpClient("smtp.gmail.com", 587)
+                    {
+                        Credentials = new NetworkCredential(
+                            senderEmail,
+                            senderPassword),
 
-            var mailMessage = new MailMessage
+                        EnableSsl = true
+                    };
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(senderEmail!),
+                        Subject = subject,
+                        Body = body,
+                        IsBodyHtml = false
+                    };
+
+                    mailMessage.To.Add(recipientEmail);
+
+                    await client.SendMailAsync(mailMessage);
+                }
+                else
+                {
+                    deliveryStatus = "Email recorded as simulated because SMTP settings are placeholders.";
+                }
+            }
+            catch (Exception ex)
             {
-                From = new MailAddress(senderEmail!),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = false
-            };
-
-            mailMessage.To.Add(recipientEmail);
-
-            await client.SendMailAsync(mailMessage);
+                deliveryStatus = $"Email recorded, but SMTP delivery failed: {ex.Message}";
+            }
 
             _context.EmailRecords.Add(new EmailRecord
             {
                 RecipientEmail = recipientEmail,
                 Subject = subject,
-                Body = body,
+                Body = $"{body}\n\nDelivery status: {deliveryStatus}",
                 SentAt = DateTime.Now
             });
 

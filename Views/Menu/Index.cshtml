@@ -7,10 +7,18 @@
 <section class="page-header">
     <h1 class="page-title">Menus</h1>
     <p class="page-subtitle">Browse meals, select customizations, and add them to your cart.</p>
+    @if (ViewBag.NearbyOnly == true)
+    {
+        <p class="page-subtitle">Showing restaurants within 10 KM of your selected location.</p>
+    }
 </section>
 
 <div class="feature-card" style="margin-bottom:25px;">
     <form method="get" asp-action="Index" style="display:flex;gap:15px;flex-wrap:wrap;align-items:end;">
+        <input type="hidden" name="userLat" value="@ViewBag.UserLat" />
+        <input type="hidden" name="userLng" value="@ViewBag.UserLng" />
+        <input type="hidden" name="nearbyOnly" value="@ViewBag.NearbyOnly" />
+
         <div class="form-group" style="flex:1;min-width:250px;">
             <label>Search Menu</label>
             <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search meals..." />
@@ -25,70 +33,122 @@
     </form>
 </div>
 
-<div class="menu-grid">
-    @foreach (var item in Model)
-    {
-        var ratings = item.Ratings?.ToList();
-        var hasRatings = ratings != null && ratings.Any();
-        var avgMenu = hasRatings ? ratings!.Average(x => x.MenuItemScore) : 0;
-        var avgCaterer = hasRatings ? ratings!.Average(x => x.CatererScore) : 0;
-        var groups = item.CustomizationOptions?.GroupBy(x => x.GroupName).ToList();
+@if (!Model.Any())
+{
+    <div class="empty-box">
+        <p>No menu items match the selected filters.</p>
+    </div>
+}
+else
+{
+    <div class="menu-grid">
+        @foreach (var item in Model)
+        {
+            var ratings = item.Ratings?.ToList();
+            var hasRatings = ratings != null && ratings.Any();
+            var avgMenu = hasRatings ? ratings!.Average(x => x.MenuItemScore) : 0;
+            var groups = item.CustomizationOptions?.GroupBy(x => x.GroupName).ToList();
 
-        <div class="menu-card">
-            <img class="menu-image" src="@(string.IsNullOrWhiteSpace(item.ImageUrl) ? "/images/food-hero-1.jpg" : item.ImageUrl)" alt="@item.Name" />
+            <div class="menu-card">
+                <img class="menu-image" src="@(string.IsNullOrWhiteSpace(item.ImageUrl) ? "/images/chicken-wrap.jpg" : item.ImageUrl)" alt="@item.Name" />
 
-            <div class="menu-card-body">
-                <div class="menu-top">
-                    <h3>@item.Name</h3>
-                    <span class="price-badge">@item.Price ₺</span>
-                </div>
+                <div class="menu-card-body">
+                    <div class="menu-top">
+                        <h3>@item.Name</h3>
+                        <span class="price-badge">@item.Price TL</span>
+                    </div>
 
-                <p class="menu-caterer"><strong>Caterer:</strong> @item.CatererName</p>
+                    <p class="menu-caterer"><strong>Caterer:</strong> @item.CatererName</p>
 
-                @if (hasRatings)
-                {
-                    <p><strong>Menu Rating:</strong> @avgMenu.ToString("0.0") / 5</p>
-                    <p><strong>Caterer Rating:</strong> @avgCaterer.ToString("0.0") / 5</p>
-                }
-                else
-                {
-                    <p>No ratings yet.</p>
-                }
-
-                <p class="menu-description">@item.Description</p>
-
-                <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                    <input type="hidden" name="menuItemId" value="@item.Id" />
-
-                    @if (groups != null && groups.Any())
+                    @if (hasRatings)
                     {
-                        <div style="margin:15px 0;">
-                            <strong>Customizations</strong>
-
-                            @foreach (var group in groups)
-                            {
-                                <div style="margin-top:10px;">
-                                    <p style="margin-bottom:6px;font-weight:700;">@group.Key</p>
-
-                                    @foreach (var option in group)
-                                    {
-                                        <label style="display:block;margin-bottom:6px;">
-                                            <input type="checkbox" name="selectedOptions" value="@option.Id" />
-                                            @option.OptionName
-                                            @if (option.PriceChange > 0)
-                                            {
-                                                <span>(+@option.PriceChange ₺)</span>
-                                            }
-                                        </label>
-                                    }
-                                </div>
-                            }
-                        </div>
+                        <p><strong>Menu Rating:</strong> @avgMenu.ToString("0.0") / 5</p>
+                    }
+                    else
+                    {
+                        <p>No ratings yet.</p>
                     }
 
-                    <button type="submit" class="menu-btn">Add to Cart</button>
-                </form>
+                    <p class="menu-description">@item.Description</p>
+
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                        <input type="hidden" name="menuItemId" value="@item.Id" />
+
+                        @if (groups != null && groups.Any())
+                        {
+                            <div style="margin:15px 0;">
+                                <strong>Customizations</strong>
+
+                                @foreach (var group in groups)
+                                {
+                                    <div style="margin-top:10px;">
+                                        <p style="margin-bottom:6px;font-weight:700;">@group.Key</p>
+
+                                        @foreach (var option in group)
+                                        {
+                                            <label style="display:block;margin-bottom:6px;">
+                                                <input type="checkbox" name="selectedOptions" value="@option.Id" />
+                                                @option.OptionName
+                                                @if (option.PriceChange > 0)
+                                                {
+                                                    <span>(+@option.PriceChange TL)</span>
+                                                }
+                                            </label>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <button type="submit" class="menu-btn">Add to Cart</button>
+                            <a asp-controller="Menu"
+                               asp-action="Details"
+                               asp-route-id="@item.Id"
+                               class="hero-btn secondary-btn">
+                                Details
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
+
+@if (ViewBag.TotalPages > 1)
+{
+    <div style="display:flex;justify-content:center;gap:15px;margin-top:25px;">
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               asp-route-search="@ViewBag.Search"
+               asp-route-caterer="@ViewBag.Caterer"
+               asp-route-userLat="@ViewBag.UserLat"
+               asp-route-userLng="@ViewBag.UserLng"
+               asp-route-nearbyOnly="@ViewBag.NearbyOnly"
+               class="small-btn">
+                Previous
+            </a>
+        }
+
+        <span style="padding:10px 16px;">
+            Page @ViewBag.CurrentPage / @ViewBag.TotalPages
+        </span>
+
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               asp-route-search="@ViewBag.Search"
+               asp-route-caterer="@ViewBag.Caterer"
+               asp-route-userLat="@ViewBag.UserLat"
+               asp-route-userLng="@ViewBag.UserLng"
+               asp-route-nearbyOnly="@ViewBag.NearbyOnly"
+               class="small-btn">
+                Next
+            </a>
+        }
+    </div>
+}

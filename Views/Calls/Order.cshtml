@@ -1,0 +1,230 @@
+@model Ceng382_25_26_202311031.Models.Order
+
+@{
+    ViewData["Title"] = "Live Call";
+    var orderId = (int)ViewBag.OrderId;
+    var caterers = ViewBag.Caterers as List<string> ?? new List<string>();
+}
+
+<section class="page-header">
+    <h1 class="page-title">Live Call for Order #@orderId</h1>
+    <p class="page-subtitle">
+        This call is available only to the customer and caterer connected to this completed order.
+    </p>
+</section>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>Order Connection</h3>
+        <p><strong>Customer:</strong> @ViewBag.CustomerEmail</p>
+        <p><strong>Caterer:</strong> @string.Join(", ", caterers)</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+        <p><strong>Total:</strong> @Model.TotalAmount TL</p>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+            <button type="button" id="joinCallBtn" class="menu-btn">Join Call</button>
+            <button type="button" id="leaveCallBtn" class="danger-btn" disabled>Leave Call</button>
+        </div>
+
+        <p id="callStatus" style="margin-top:18px;">Ready to connect.</p>
+    </div>
+
+    <div class="payment-form-box">
+        <h3>Audio</h3>
+        <p>Your microphone is used only after you join the order call.</p>
+
+        <div style="display:grid;gap:16px;margin-top:18px;">
+            <div>
+                <strong>Your Audio</strong>
+                <audio id="localAudio" autoplay muted controls style="width:100%;margin-top:8px;"></audio>
+            </div>
+
+            <div>
+                <strong>Remote Audio</strong>
+                <audio id="remoteAudio" autoplay controls style="width:100%;margin-top:8px;"></audio>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="feature-card" style="margin-top:25px;">
+    <h3>Order Items</h3>
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Caterer</th>
+                <th>Customizations</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderItems)
+            {
+                <tr>
+                    <td>@item.MenuItemName</td>
+                    <td>@item.CatererName</td>
+                    <td>@item.SelectedCustomizations</td>
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const orderId = @orderId;
+        const statusEl = document.getElementById("callStatus");
+        const joinBtn = document.getElementById("joinCallBtn");
+        const leaveBtn = document.getElementById("leaveCallBtn");
+        const localAudio = document.getElementById("localAudio");
+        const remoteAudio = document.getElementById("remoteAudio");
+
+        let connection;
+        let localStream;
+        let peerConnection;
+        let tracksAdded = false;
+
+        function setStatus(message) {
+            statusEl.textContent = message;
+        }
+
+        async function startConnection() {
+            if (connection) {
+                return;
+            }
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/orderCallHub")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("ParticipantJoined", async function () {
+                if (!localStream) {
+                    return;
+                }
+
+                await ensurePeerConnection();
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                await connection.invoke("SendOffer", orderId, JSON.stringify(offer));
+                setStatus("A participant joined. Sending call invitation.");
+            });
+
+            connection.on("ReceiveOffer", async function (offerJson) {
+                await startMedia();
+                await ensurePeerConnection();
+                await peerConnection.setRemoteDescription(JSON.parse(offerJson));
+
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                await connection.invoke("SendAnswer", orderId, JSON.stringify(answer));
+                setStatus("Connected to an incoming order call.");
+            });
+
+            connection.on("ReceiveAnswer", async function (answerJson) {
+                await peerConnection.setRemoteDescription(JSON.parse(answerJson));
+                setStatus("Live call connected.");
+            });
+
+            connection.on("ReceiveIceCandidate", async function (candidateJson) {
+                if (peerConnection) {
+                    await peerConnection.addIceCandidate(JSON.parse(candidateJson));
+                }
+            });
+
+            connection.on("ParticipantLeft", function () {
+                setStatus("The other participant left the call.");
+            });
+
+            await connection.start();
+        }
+
+        async function startMedia() {
+            if (localStream) {
+                return;
+            }
+
+            localStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false
+            });
+
+            localAudio.srcObject = localStream;
+        }
+
+        async function ensurePeerConnection() {
+            if (peerConnection) {
+                return;
+            }
+
+            peerConnection = new RTCPeerConnection({
+                iceServers: [
+                    { urls: "stun:stun.l.google.com:19302" }
+                ]
+            });
+
+            peerConnection.onicecandidate = async function (event) {
+                if (event.candidate) {
+                    await connection.invoke("SendIceCandidate", orderId, JSON.stringify(event.candidate));
+                }
+            };
+
+            peerConnection.ontrack = function (event) {
+                remoteAudio.srcObject = event.streams[0];
+            };
+
+            if (localStream && !tracksAdded) {
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+
+                tracksAdded = true;
+            }
+        }
+
+        joinBtn.addEventListener("click", async function () {
+            try {
+                joinBtn.disabled = true;
+                setStatus("Requesting microphone access...");
+
+                await startMedia();
+                await startConnection();
+                await ensurePeerConnection();
+                await connection.invoke("JoinOrderCall", orderId);
+
+                leaveBtn.disabled = false;
+                setStatus("Joined. Waiting for the other participant if they are not here yet.");
+            }
+            catch (error) {
+                joinBtn.disabled = false;
+                setStatus("Call could not be started: " + error.message);
+            }
+        });
+
+        leaveBtn.addEventListener("click", async function () {
+            if (connection) {
+                await connection.invoke("LeaveOrderCall", orderId);
+            }
+
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+
+            tracksAdded = false;
+            localAudio.srcObject = null;
+            remoteAudio.srcObject = null;
+            joinBtn.disabled = false;
+            leaveBtn.disabled = true;
+            setStatus("Call ended.");
+        });
+    </script>
+}

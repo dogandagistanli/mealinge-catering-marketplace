@@ -5,6 +5,7 @@ using Ceng382_25_26_202311031.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ceng382_25_26_202311031.Controllers
 {
@@ -54,7 +55,7 @@ namespace Ceng382_25_26_202311031.Controllers
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
-                return Redirect("/Identity/Account/Login");
+                return RedirectToAction("Login", "Auth");
 
             var order = new Order
             {
@@ -66,6 +67,7 @@ namespace Ceng382_25_26_202311031.Controllers
                 {
                     MenuItemId = x.MenuItemId,
                     MenuItemName = x.Name,
+                    CatererId = x.CatererId,
                     CatererName = x.CatererName,
                     UnitPrice = x.UnitPrice,
                     CustomizationPrice = x.CustomizationPrice,
@@ -80,22 +82,51 @@ namespace Ceng382_25_26_202311031.Controllers
             var itemSummary = string.Join("\n", order.OrderItems.Select(x =>
                 $"{x.MenuItemName} - {x.Quantity} x {x.FinalUnitPrice} TL - {x.SelectedCustomizations}"));
 
+            var orderLinks =
+                $"Receipt: /Orders/Receipt/{order.Id}\nAgreement: /Orders/Agreement/{order.Id}\nLive Call: /Calls/Order/{order.Id}";
+
             await _emailService.SendAsync(
                 user.Email ?? "unknown@mealinge.com",
                 $"Mealinge Order Confirmation #{order.Id}",
-                $"Your order has been completed.\n\nOrder ID: {order.Id}\nTotal: {order.TotalAmount} TL\n\nItems:\n{itemSummary}");
+                $"Your order has been completed.\n\nOrder ID: {order.Id}\nTotal: {order.TotalAmount} TL\n\nItems:\n{itemSummary}\n\n{orderLinks}");
 
-            var catererEmails = order.OrderItems
-                .Select(x => $"{x.CatererName.Replace(" ", "").ToLower()}@mealinge.com")
+            var catererIds = order.OrderItems
+                .Where(x => !string.IsNullOrWhiteSpace(x.CatererId))
+                .Select(x => x.CatererId!)
                 .Distinct()
                 .ToList();
 
-            foreach (var catererEmail in catererEmails)
+            var caterers = await _context.Users
+                .Where(x => catererIds.Contains(x.Id))
+                .ToListAsync();
+
+            var fallbackCatererNames = order.OrderItems
+                .Where(x => string.IsNullOrWhiteSpace(x.CatererId))
+                .Select(x => x.CatererName)
+                .Distinct()
+                .ToList();
+
+            if (fallbackCatererNames.Any())
             {
+                var fallbackCaterers = await _context.Users
+                    .Where(x => fallbackCatererNames.Contains(x.FullName))
+                    .ToListAsync();
+
+                caterers.AddRange(fallbackCaterers.Where(x => caterers.All(y => y.Id != x.Id)));
+            }
+
+            foreach (var caterer in caterers)
+            {
+                var catererItems = order.OrderItems
+                    .Where(x =>
+                        x.CatererId == caterer.Id ||
+                        (string.IsNullOrWhiteSpace(x.CatererId) && x.CatererName == caterer.FullName))
+                    .Select(x => $"{x.MenuItemName} - {x.Quantity} x {x.FinalUnitPrice} TL - {x.SelectedCustomizations}");
+
                 await _emailService.SendAsync(
-                    catererEmail,
+                    caterer.Email ?? "unknown@mealinge.com",
                     $"New Mealinge Order #{order.Id}",
-                    $"A new order has been placed.\n\nOrder ID: {order.Id}\nCustomer: {user.Email}\nTotal: {order.TotalAmount} TL\n\nItems:\n{itemSummary}");
+                    $"A new completed order includes your menu items.\n\nOrder ID: {order.Id}\nCustomer: {user.Email}\nItems:\n{string.Join("\n", catererItems)}\n\nLive Call: /Calls/Order/{order.Id}");
             }
 
             await _logService.LogAsync(
@@ -106,15 +137,16 @@ namespace Ceng382_25_26_202311031.Controllers
             await _logService.LogAsync(
                 "Payment",
                 user.Email,
-                $"Order #{order.Id} completed successfully. Total: {order.TotalAmount} ₺");
+                $"Order #{order.Id} completed successfully. Total: {order.TotalAmount} TL");
 
             HttpContext.Session.Remove(CartSessionKey);
 
-            return RedirectToAction("Success");
+            return RedirectToAction("Success", new { orderId = order.Id });
         }
 
-        public IActionResult Success()
+        public IActionResult Success(int? orderId)
         {
+            ViewBag.OrderId = orderId;
             return View();
         }
 

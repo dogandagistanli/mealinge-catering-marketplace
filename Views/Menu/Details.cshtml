@@ -1,0 +1,103 @@
+@model Ceng382_25_26_202311031.Models.MenuItem
+
+@{
+    ViewData["Title"] = Model.Name;
+    var ratings = Model.Ratings?.OrderByDescending(x => x.CreatedAt).ToList() ?? new List<Rating>();
+    var avgMenu = ratings.Any() ? ratings.Average(x => x.MenuItemScore) : 0;
+    var avgCaterer = (double)(ViewBag.CatererAverage ?? 0);
+    var groups = Model.CustomizationOptions?.GroupBy(x => x.GroupName).ToList();
+}
+
+<section class="page-header">
+    <h1 class="page-title">@Model.Name</h1>
+    <p class="page-subtitle">@Model.Description</p>
+</section>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <img src="@Model.ImageUrl"
+             alt="@Model.Name"
+             style="width:100%;height:340px;object-fit:cover;border-radius:18px;margin-bottom:20px;" />
+
+        <h3>@Model.Price TL</h3>
+        <p><strong>Caterer:</strong> @Model.CatererName</p>
+        <p><strong>Average Menu Rating:</strong> @(ratings.Any() ? avgMenu.ToString("0.0") : "No rating")</p>
+        <p><strong>Average Caterer Rating:</strong> @(avgCaterer > 0 ? avgCaterer.ToString("0.0") : "No rating")</p>
+    </div>
+
+    <div class="payment-form-box">
+        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+            <input type="hidden" name="menuItemId" value="@Model.Id" />
+
+            @if (groups != null && groups.Any())
+            {
+                <h3>Customize</h3>
+
+                @foreach (var group in groups)
+                {
+                    <div class="form-group">
+                        <label>@group.Key</label>
+
+                        @foreach (var option in group)
+                        {
+                            <label style="display:block;margin-bottom:8px;">
+                                <input type="checkbox" name="selectedOptions" value="@option.Id" />
+                                @option.OptionName
+                                <span>
+                                    @option.OptionType
+                                    @if (option.PriceChange != 0)
+                                    {
+                                        <text> (@(option.PriceChange > 0 ? "+" : "")@option.PriceChange TL)</text>
+                                    }
+                                </span>
+                            </label>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No customization options are defined for this menu item.</p>
+            }
+
+            <button type="submit" class="menu-btn">Add to Cart</button>
+        </form>
+    </div>
+</div>
+
+<div class="feature-card" style="margin-top:25px;">
+    <h3>Completed Order Comments</h3>
+
+    @if (!ratings.Any())
+    {
+        <p>No comments yet.</p>
+    }
+    else
+    {
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Menu Score</th>
+                    <th>Caterer Score</th>
+                    <th>Comment</th>
+                    <th>Order</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rating in ratings)
+                {
+                    <tr>
+                        <td>@(rating.User?.FullName ?? "User")</td>
+                        <td>@rating.MenuItemScore / 5</td>
+                        <td>@rating.CatererScore / 5</td>
+                        <td>@rating.Comment</td>
+                        <td>#@rating.OrderId</td>
+                        <td>@rating.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

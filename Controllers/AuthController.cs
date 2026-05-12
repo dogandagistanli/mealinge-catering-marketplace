@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Ceng382_25_26_202311031.Data;
 using Ceng382_25_26_202311031.Models;
 using Ceng382_25_26_202311031.Services;
@@ -68,7 +69,18 @@ namespace Ceng382_25_26_202311031.Controllers
 
             if (user.EmailTwoFactorEnabled)
             {
-                var code = Random.Shared.Next(100000, 999999).ToString();
+                var activeCodes = await _context.TwoFactorCodes
+                    .Where(x => x.UserId == user.Id && !x.IsUsed)
+                    .ToListAsync();
+
+                foreach (var activeCode in activeCodes)
+                {
+                    activeCode.IsUsed = true;
+                }
+
+                var code = RandomNumberGenerator
+                    .GetInt32(100000, 1000000)
+                    .ToString();
 
                 _context.TwoFactorCodes.Add(new TwoFactorCode
                 {
@@ -174,6 +186,11 @@ namespace Ceng382_25_26_202311031.Controllers
 
             if (codeRecord == null || codeRecord.ExpiresAt < DateTime.Now)
             {
+                await _logService.LogAsync(
+                    "FAILED TWO FACTOR LOGIN",
+                    null,
+                    $"Invalid or expired two-factor code was submitted for user id {userId}.");
+
                 ModelState.AddModelError("", "Invalid or expired verification code.");
                 return View(model);
             }

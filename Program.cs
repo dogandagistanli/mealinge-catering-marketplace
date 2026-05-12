@@ -1,4 +1,5 @@
 using Ceng382_25_26_202311031.Data;
+using Ceng382_25_26_202311031.Hubs;
 using Ceng382_25_26_202311031.Services;
 using Ceng382_25_26_202311031.Models;
 using Microsoft.AspNetCore.Identity;
@@ -6,13 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Add services to the container.
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<OrderAccessService>();
 builder.Services.AddScoped<SimplePdfService>();
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -59,12 +66,16 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapHub<OrderCallHub>("/orderCallHub");
+
 app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
 
+    await context.Database.MigrateAsync();
     await DbSeeder.SeedRolesAndUsersAsync(services);
     await MenuSeeder.SeedMenusAsync(services);
 }

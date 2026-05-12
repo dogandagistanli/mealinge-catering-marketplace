@@ -22,7 +22,7 @@ namespace Ceng382_25_26_202311031.Controllers
             _logService = logService;
         }
 
-        public async Task<IActionResult> Create(int orderId)
+        public async Task<IActionResult> Create(int orderId, int? orderItemId)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -33,19 +33,36 @@ namespace Ceng382_25_26_202311031.Controllers
             if (order == null)
                 return NotFound();
 
-            var alreadyRated = await _context.Ratings.AnyAsync(x => x.OrderId == orderId);
+            var orderItem = orderItemId.HasValue
+                ? order.OrderItems.FirstOrDefault(x => x.Id == orderItemId.Value)
+                : null;
+
+            var ratedMenuItemIds = await _context.Ratings
+                .Where(r => r.OrderId == orderId && r.UserId == user!.Id)
+                .Select(r => r.MenuItemId)
+                .ToListAsync();
+
+            orderItem ??= order.OrderItems
+                .FirstOrDefault(item => !ratedMenuItemIds.Contains(item.MenuItemId));
+
+            if (orderItem == null)
+                return RedirectToAction("Index", "Orders");
+
+            var alreadyRated = await _context.Ratings.AnyAsync(x =>
+                x.OrderId == orderId &&
+                x.UserId == user!.Id &&
+                x.MenuItemId == orderItem.MenuItemId);
 
             if (alreadyRated)
                 return RedirectToAction("Index", "Orders");
 
-            var firstItem = order.OrderItems.First();
-
             var rating = new Rating
             {
                 OrderId = order.Id,
-                MenuItemId = firstItem.MenuItemId,
-                MenuItemName = firstItem.MenuItemName,
-                CatererName = firstItem.CatererName,
+                OrderItemId = orderItem.Id,
+                MenuItemId = orderItem.MenuItemId,
+                MenuItemName = orderItem.MenuItemName,
+                CatererName = orderItem.CatererName,
                 UserId = user!.Id
             };
 
@@ -58,7 +75,32 @@ namespace Ceng382_25_26_202311031.Controllers
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
-                return Redirect("/Identity/Account/Login");
+                return RedirectToAction("Login", "Auth");
+
+            var order = await _context.Orders
+                .Include(x => x.OrderItems)
+                .FirstOrDefaultAsync(x =>
+                    x.Id == rating.OrderId &&
+                    x.UserId == user.Id &&
+                    x.Status == "Paid");
+
+            if (order == null)
+                return NotFound();
+
+            var orderItem = rating.OrderItemId.HasValue
+                ? order.OrderItems.FirstOrDefault(x => x.Id == rating.OrderItemId.Value)
+                : order.OrderItems.FirstOrDefault(x => x.MenuItemId == rating.MenuItemId);
+
+            if (orderItem == null)
+                return NotFound();
+
+            var alreadyRated = await _context.Ratings.AnyAsync(x =>
+                x.OrderId == order.Id &&
+                x.UserId == user.Id &&
+                x.MenuItemId == orderItem.MenuItemId);
+
+            if (alreadyRated)
+                return RedirectToAction("Index", "Orders");
 
             if (rating.MenuItemScore < 1 || rating.MenuItemScore > 5)
                 ModelState.AddModelError("MenuItemScore", "Menu score must be between 1 and 5.");
@@ -67,8 +109,19 @@ namespace Ceng382_25_26_202311031.Controllers
                 ModelState.AddModelError("CatererScore", "Caterer score must be between 1 and 5.");
 
             if (!ModelState.IsValid)
+            {
+                rating.OrderItemId = orderItem.Id;
+                rating.MenuItemId = orderItem.MenuItemId;
+                rating.MenuItemName = orderItem.MenuItemName;
+                rating.CatererName = orderItem.CatererName;
                 return View(rating);
+            }
 
+            rating.OrderId = order.Id;
+            rating.OrderItemId = orderItem.Id;
+            rating.MenuItemId = orderItem.MenuItemId;
+            rating.MenuItemName = orderItem.MenuItemName;
+            rating.CatererName = orderItem.CatererName;
             rating.UserId = user.Id;
             rating.CreatedAt = DateTime.Now;
 

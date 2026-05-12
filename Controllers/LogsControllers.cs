@@ -27,7 +27,7 @@ namespace Ceng382_25_26_202311031.Controllers
             {
                 query = query.Where(x =>
                     x.Action.Contains(search) ||
-                    x.UserEmail.Contains(search) ||
+                    (x.UserEmail != null && x.UserEmail.Contains(search)) ||
                     x.Description.Contains(search));
             }
 

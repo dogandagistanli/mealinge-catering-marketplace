@@ -7,6 +7,9 @@ namespace Ceng382_25_26_202311031.Models
         public int OrderId { get; set; }
         public Order? Order { get; set; }
 
+        public int? OrderItemId { get; set; }
+        public OrderItem? OrderItem { get; set; }
+
         public int MenuItemId { get; set; }
 
         public string MenuItemName { get; set; } = "";

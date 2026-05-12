@@ -4,6 +4,7 @@ namespace Ceng382_25_26_202311031.Models
     {
         public int MenuItemId { get; set; }
         public string Name { get; set; } = "";
+        public string? CatererId { get; set; }
         public string CatererName { get; set; } = "";
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }

@@ -26,6 +26,7 @@ namespace Ceng382_25_26_202311031.Controllers
         public async Task<IActionResult> AddToCart(int menuItemId, List<int>? selectedOptions)
         {
             var menuItem = await _context.MenuItems
+                .Include(x => x.Caterer)
                 .Include(x => x.CustomizationOptions)
                 .FirstOrDefaultAsync(x => x.Id == menuItemId);
 
@@ -39,7 +40,7 @@ namespace Ceng382_25_26_202311031.Controllers
                 .ToList() ?? new List<CustomizationOption>();
 
             var selectedText = chosenOptions.Any()
-                ? string.Join(", ", chosenOptions.Select(x => $"{x.OptionName} ({x.PriceChange} ₺)"))
+                ? string.Join(", ", chosenOptions.Select(x => $"{x.OptionName} ({x.PriceChange} TL)"))
                 : "No customization";
 
             var customizationPrice = chosenOptions.Sum(x => x.PriceChange);
@@ -60,6 +61,7 @@ namespace Ceng382_25_26_202311031.Controllers
                 {
                     MenuItemId = menuItem.Id,
                     Name = menuItem.Name,
+                    CatererId = menuItem.CatererId,
                     CatererName = menuItem.CatererName,
                     UnitPrice = menuItem.Price,
                     CustomizationPrice = customizationPrice,

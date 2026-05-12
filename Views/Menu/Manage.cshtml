@@ -44,7 +44,7 @@ else
 
                         <td>@item.Name</td>
                         <td>@item.CatererName</td>
-                        <td>@item.Price ₺</td>
+                        <td>@item.Price TL</td>
 
                         <td>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -77,4 +77,31 @@ else
             </tbody>
         </table>
     </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div style="display:flex;justify-content:center;gap:15px;margin-top:25px;">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <a asp-action="Manage"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                   class="small-btn">
+                    Previous
+                </a>
+            }
+
+            <span style="padding:10px 16px;">
+                Page @ViewBag.CurrentPage / @ViewBag.TotalPages
+            </span>
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <a asp-action="Manage"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                   class="small-btn">
+                    Next
+                </a>
+            }
+        </div>
+    }
 }

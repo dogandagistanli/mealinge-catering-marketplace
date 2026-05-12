@@ -51,11 +51,18 @@ namespace Ceng382_25_26_202311031.Controllers
                 .CountAsync(x => x.CatererId == user!.Id);
 
             ViewBag.TotalOrders = await _context.OrderItems
-                .CountAsync(x => x.CatererName == catererName);
+                .Where(x =>
+                    x.CatererId == user!.Id ||
+                    ((x.CatererId == null || x.CatererId == "") && x.CatererName == catererName))
+                .Select(x => x.OrderId)
+                .Distinct()
+                .CountAsync();
 
             ViewBag.TotalRevenue = await _context.OrderItems
-                .Where(x => x.CatererName == catererName)
-                .SumAsync(x => x.UnitPrice * x.Quantity);
+                .Where(x =>
+                    x.CatererId == user!.Id ||
+                    ((x.CatererId == null || x.CatererId == "") && x.CatererName == catererName))
+                .SumAsync(x => (x.UnitPrice + x.CustomizationPrice) * x.Quantity);
 
             var ratings = await _context.Ratings
                 .Where(x => x.CatererName == catererName)

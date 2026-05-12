@@ -29,6 +29,30 @@
             View Orders
         </a>
 
+        @if (ViewBag.OrderId != null)
+        {
+            <a asp-controller="Orders"
+               asp-action="Receipt"
+               asp-route-id="@ViewBag.OrderId"
+               class="hero-btn secondary-btn">
+                Download Receipt
+            </a>
+
+            <a asp-controller="Orders"
+               asp-action="Agreement"
+               asp-route-id="@ViewBag.OrderId"
+               class="hero-btn secondary-btn">
+                Download Agreement
+            </a>
+
+            <a asp-controller="Calls"
+               asp-action="Order"
+               asp-route-id="@ViewBag.OrderId"
+               class="menu-btn">
+                Live Call
+            </a>
+        }
+
         <a asp-controller="Menu"
            asp-action="Index"
            class="hero-btn secondary-btn">

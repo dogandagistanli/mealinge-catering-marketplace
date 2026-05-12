@@ -18,6 +18,14 @@
         Find My Location
     </button>
 
+    <a id="browseNearbyMenus"
+       asp-controller="Menu"
+       asp-action="Index"
+       class="hero-btn secondary-btn"
+       style="margin-left:12px;pointer-events:none;opacity:0.5;">
+        Browse Nearby Menus
+    </a>
+
     <p style="margin-top:15px;">
         Only nearby caterers within 10 KM are displayed.
     </p>
@@ -128,6 +136,28 @@
             map.setCenter(userLocation);
 
             map.setZoom(13);
+
+            const browseNearbyMenus =
+                document.getElementById("browseNearbyMenus");
+
+            browseNearbyMenus.href =
+                `/Menu?nearbyOnly=true&userLat=${userLocation.lat}&userLng=${userLocation.lng}`;
+
+            browseNearbyMenus.style.pointerEvents = "auto";
+            browseNearbyMenus.style.opacity = "1";
+
+            fetch("/Nearby/SaveUserLocation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    latitude: userLocation.lat,
+                    longitude: userLocation.lng
+                })
+            }).catch(() => {
+                console.log("Location was used for this session but was not saved.");
+            });
 
             if (userMarker) {
                 userMarker.setMap(null);
