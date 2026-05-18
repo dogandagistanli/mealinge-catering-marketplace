@@ -30,9 +30,12 @@ namespace Ceng382_25_26_202311031.Controllers
             _logService = logService;
         }
 
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
-            return View(new LoginViewModel());
+            return View(new LoginViewModel
+            {
+                ReturnUrl = returnUrl
+            });
         }
 
         [HttpPost]
@@ -98,6 +101,7 @@ namespace Ceng382_25_26_202311031.Controllers
                     $"Your Mealinge login verification code is: {code}\n\nThis code expires in 5 minutes.");
 
                 HttpContext.Session.SetString("TwoFactorUserId", user.Id);
+                HttpContext.Session.SetString("TwoFactorReturnUrl", model.ReturnUrl ?? "");
 
                 return RedirectToAction("VerifyTwoFactor");
             }
@@ -109,12 +113,21 @@ namespace Ceng382_25_26_202311031.Controllers
                 user.Email,
                 "User logged into the system.");
 
+            if (!string.IsNullOrWhiteSpace(model.ReturnUrl) &&
+                Url.IsLocalUrl(model.ReturnUrl))
+            {
+                return LocalRedirect(model.ReturnUrl);
+            }
+
             return RedirectToAction("Index", "Dashboard");
         }
 
-        public IActionResult Register()
+        public IActionResult Register(string? returnUrl = null)
         {
-            return View(new RegisterViewModel());
+            return View(new RegisterViewModel
+            {
+                ReturnUrl = returnUrl
+            });
         }
 
         [HttpPost]
@@ -160,7 +173,7 @@ namespace Ceng382_25_26_202311031.Controllers
                 user.Email,
                 "New user account was created.");
 
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", new { returnUrl = model.ReturnUrl });
         }
 
         public IActionResult VerifyTwoFactor()
@@ -210,7 +223,16 @@ namespace Ceng382_25_26_202311031.Controllers
                 user.Email,
                 "User completed two-factor authentication.");
 
+            var returnUrl = HttpContext.Session.GetString("TwoFactorReturnUrl");
+
             HttpContext.Session.Remove("TwoFactorUserId");
+            HttpContext.Session.Remove("TwoFactorReturnUrl");
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) &&
+                Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
 
             return RedirectToAction("Index", "Dashboard");
         }

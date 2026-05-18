@@ -130,16 +130,7 @@ namespace Ceng382_25_26_202311031.Data
                 }
             }
 
-            var personalUser =
-                await userManager.FindByEmailAsync("dogandagistanli@gmail.com");
-
-            if (personalUser != null)
-            {
-                if (!await userManager.IsInRoleAsync(personalUser, "User"))
-                {
-                    await userManager.AddToRoleAsync(personalUser, "User");
-                }
-            }
+        
         }
     }
 }

@@ -16,6 +16,8 @@
              style="margin-bottom:20px;">
         </div>
 
+        <input type="hidden" asp-for="ReturnUrl" />
+
         <div class="form-group">
             <label class="form-label">Full Name</label>
 
@@ -42,6 +44,14 @@
                 class="menu-btn">
             Create Account
         </button>
+
+        <p style="margin-top:18px;color:var(--muted);">
+            Already have an account?
+            <a asp-action="Login"
+               asp-route-returnUrl="@Model.ReturnUrl">
+                Sign in
+            </a>
+        </p>
 
     </form>
 
