@@ -9,5 +9,13 @@ obj/
 *.userosscache
 *.sln.docstates
 
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+
+.env
+.env.*
+!.env.example
+
 .DS_Store
 Thumbs.db
